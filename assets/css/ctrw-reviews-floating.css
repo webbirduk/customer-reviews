@@ -2,7 +2,7 @@
 .ctrw-floating-widget {
     position: fixed;
     right: 20px;
-    bottom: 20px;
+    bottom: 0px;
     z-index: 9999;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
     --ctrw-primary: #FFB800;
@@ -302,7 +302,7 @@
 @media (max-width: 480px) {
     .ctrw-floating-widget {
         right: 10px;
-        bottom: 10px;
+        bottom: 0px;
         left: 10px;
     }
     
