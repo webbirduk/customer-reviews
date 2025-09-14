@@ -8,7 +8,7 @@ $settings = get_option('customer_reviews_settings');
 
 <div class="ctrw-summary-container">
     <div class="ctrw-summary-header">
-        <h3 class="ctrw-summary-title">Customer Reviews Summary</h3>
+        <p class="ctrw-summary-title">Customer Review Summary</p>
 
           <?php
             $average_rating = 0;
