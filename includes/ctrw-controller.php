@@ -43,7 +43,7 @@ class Review_Controller {
         add_action('wp_ajax_nopriv_load_reviews_ajax', array($this, 'load_reviews_ajax_handler'));
 
         // Other hooks
-        add_action('save_post', [$this, 'ctrw_save_meta_box_data']);
+        //add_action('save_post', [$this, 'ctrw_save_meta_box_data']);
         add_shortcode('wp_ctrw_form', [$this,'customer_reviews_form_shortcode']);
         add_shortcode('wp_ctrw_summary', [$this,'ctrw_display_summary']);
         add_shortcode('wp_ctrw_lists', [$this,'customer_reviews_list_shortcode']);
