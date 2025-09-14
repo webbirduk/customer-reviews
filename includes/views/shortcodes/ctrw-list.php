@@ -21,8 +21,9 @@ $current_page = max(1, get_query_var('review_page', 1));
 $total_reviews = count($filtered_reviews);
 $total_pages = ceil($total_reviews / $reviews_per_page);
 $offset = ($current_page - 1) * $reviews_per_page;
-$reviews = array_slice($filtered_reviews, $offset, 0);
+$reviews = array_slice($filtered_reviews, $offset, $reviews_per_page);
 ?>
+
 
 <div class="customer-reviews-form-container">
     <div id="reviews-container" data-post-id="<?php echo $current_post_id; ?>">

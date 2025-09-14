@@ -102,7 +102,7 @@ $settings = get_option('customer_reviews_settings');
 }
 
 .ctrw-summary-title {
-    font-size: 20px;
+    font-size: 18px;
     font-weight: 600;
     color: #333333;
     margin: 0 0 16px 0;
@@ -121,7 +121,7 @@ $settings = get_option('customer_reviews_settings');
 }
 
 .ctrw-average-number {
-    font-size: 42px;
+    font-size: 38px;
     font-weight: 700;
     color: #333333;
     line-height: 1;
@@ -176,6 +176,7 @@ $settings = get_option('customer_reviews_settings');
     display: flex;
     flex-direction: column;
     gap: 12px;
+    line-height: 14px;
 }
 
 .ctrw-rating-row {

@@ -1,219 +1,429 @@
 <?php
+/**
+* Customer Reviews Slider Template
+*
+* This template displays customer reviews in a responsive, stylish slider.
+*
+* @package ctrw
+*/
+
 if (!defined('ABSPATH')) {
-    exit;
+   exit; // Exit if accessed directly.
 }
-$horizontal_count =  $reviews_per_page = get_option('customer_reviews_settings')['reviews_per_row_slder'] ?? 3;
-$reviews = (new CTRW_Review_Model())->get_reviews('approved');
+
+// Fetch approved reviews from the database model.
+$reviews_model = new CTRW_Review_Model();
+$reviews = $reviews_model->get_reviews('approved');
+
+// Get plugin settings to determine how many reviews to show.
+$settings = get_option('customer_reviews_settings', []);
+$reviews_per_page = $settings['reviews_per_page'] ?? 10;
+$reviews = array_slice($reviews, 0, $reviews_per_page);
+$review_count = count($reviews);
 ?>
 
-<div class="ctrw-slider-container" data-horizontal-count="<?php echo esc_attr($horizontal_count); ?>">
-    <div class="ctrw-slider-wrapper">
-        <div class="ctrw-slider-slides">
-            <?php
-            $reviews_per_page = get_option('customer_reviews_settings')['reviews_per_page'] ?? 10;
-            $reviews = array_slice($reviews, 0, $reviews_per_page);
+<style>
+ 
 
-            foreach ($reviews as $index => $review) {
-                $page_id = get_queried_object_id();
-                $post_id = get_the_ID();
-                $product_id = function_exists('wc_get_product') ? get_the_ID() : null;
+   /* ========== Main Slider Container ========== */
+   .ctrw-slider-container {
+       max-width: 1200px;
+       margin: 40px auto;
+       padding: 0 40px; /* Increased padding to make space for external arrows */
+       position: relative;
+       font-family: 'Inter', sans-serif;
+       color: #333;
+   }
 
-                $is_product_page = function_exists('is_product') && is_product();
-                if($is_product_page && $review->positionid != $is_product_page || $review->positionid != $page_id || $review->positionid != $post_id) {
-                    continue;
-                }
-                
-                $settings = get_option('customer_reviews_settings');
-                $show_city = !empty($settings['show_city']);
-                $show_state = !empty($settings['show_state']);
+   /* ========== Slider Header ========== */
+   .ctrw-slider-header {
+       text-align: center;
+       margin-bottom: 30px;
+   }
 
-                if (!isset($settings['enable_review_title'])) {
-                    $show_title = true;
-                } else {
-                    $show_title = !empty($settings['enable_review_title']);
-                }
+   .ctrw-slider-header h2 {
+       font-size: 28px;
+       font-weight: 700;
+       margin: 0 0 10px;
+       color: #111;
+   }
+  
+   .ctrw-slider-header .ctrw-header-rating {
+       color: #FFC107;
+       font-size: 24px;
+       margin-bottom: 10px;
+   }
 
-                $date_format = get_option('customer_reviews_settings')['date_format'] ?? 'MM/DD/YYYY';
-                $include_time = get_option('customer_reviews_settings')['include_time'] ?? false;
+   .ctrw-slider-header p {
+       font-size: 16px;
+       color: #666;
+       margin: 0;
+   }
 
-                $formatted_date = '';
-                if (!empty($review->created_at)) {
-                    $timestamp = strtotime($review->created_at);
-                    switch ($date_format) {
-                        case 'DD/MM/YYYY':
-                            $formatted_date = date('d/m/Y', $timestamp);
-                            break;
-                        case 'YYYY/MM/DD':
-                            $formatted_date = date('Y/m/d', $timestamp);
-                            break;
-                        default:
-                            $formatted_date = date('m/d/Y', $timestamp);
-                            break;
-                    }
-                }
+   .ctrw-slider-header .google-logo {
+       height: 24px;
+       margin-top: 15px;
+       opacity: 0.8;
+   }
 
-                // Generate initials for avatar (max 2 letters)
-                $name_parts = explode(' ', $review->name);
-                $initials = '';
-                $count = 0;
-                foreach ($name_parts as $part) {
-                    if (!empty($part) && $count < 2) {
-                        $initials .= strtoupper(substr($part, 0, 1));
-                        $count++;
-                    }
-                }
-            ?>
-            <div class="ctrw-slider-slide <?php echo $index === 0 ? 'ctrw-slider-active' : ''; ?>" data-index="<?php echo $index; ?>">
-                <div class="ctrw-slider-card">
-                    <div class="ctrw-slider-meta">
-                        <div class="ctrw-reviewer-avatar"><?php echo esc_html($initials); ?></div>
+   /* ========== New Navigation Wrapper ========== */
+   .ctrw-slider-navigation-wrapper {
+       position: relative;
+   }
 
-                        <div class="ctrw-slider-author-info">
-                            <div class="ctrw-slider-author-name">
-                                <?= esc_html($review->name); ?>
-                            </div>
-                            <div class="ctrw-slider-author-location">
-                                <?php if ($show_city && !empty($review->city)) : ?>
-                                    <?= esc_html($review->city); ?>
-                                    <?php if ($show_state && !empty($review->state)) echo ', '; ?>
-                                <?php endif; ?>
-                                <?php if ($show_state && !empty($review->state)) : ?>
-                                    <?= esc_html($review->state); ?>
-                                <?php endif; ?>
-                            </div>
-                            <div class="ctrw-slider-date">
-                                <?= esc_html($formatted_date); ?>
-                                <?php if ($include_time) : ?>
-                                    <span class="ctrw-slider-time"><?= date('H:i', $timestamp); ?></span>
-                                <?php endif; ?>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="ctrw-slider-rating">
-                        <?php
-                        $total_stars = 5;
-                        $rating = (int) $review->rating;
-                        
-                        for ($i = 1; $i <= $total_stars; $i++) {
-                            if ($i <= $rating) {
-                                echo '<span class="ctrw-slider-star ctrw-slider-filled">★</span>';
-                            } else {
-                                echo '<span class="ctrw-slider-star ctrw-slider-empty">★</span>';
-                            }
-                        }
-                        ?>
-                    </div>
-                    
-                    <?php if ($show_title && !empty($review->title)) : ?>
-                        <h3 class="ctrw-slider-title"><?= esc_html($review->title); ?></h3>
-                    <?php endif; ?>
-                    
-                    <div class="ctrw-slider-content">
-                        <?php
-                        $font_size = get_option('customer_reviews_settings')['comment_font_size'] ?? 14;
-                        $font_style = get_option('customer_reviews_settings')['comment_font_style'] ?? 'normal';
-                        $line_height = get_option('customer_reviews_settings')['comment_line_height'] ?? 23;
-                        ?>
-                        <p style="font-size: <?php echo esc_attr($font_size); ?>px; font-style: <?php echo esc_attr($font_style); ?>; line-height: <?php echo esc_attr($line_height); ?>px;">
-                            <?= esc_html($review->comment); ?>
-                        </p>
-                    </div>
-                    
-                    <?php if (!empty($review->admin_reply)) : ?>
-                        <div class="ctrw-slider-response">
-                            <div class="ctrw-slider-response-label"><?php esc_html_e('Author Response', 'wp_cr'); ?></div>
-                            <div class="ctrw-slider-response-content"><?= esc_html($review->admin_reply); ?></div>
-                        </div>
-                    <?php endif; ?>
-                </div>
-            </div>
-            <?php } ?>
-        </div>
-        
-        <div class="ctrw-slider-controls">
-            <button class="ctrw-slider-prev" aria-label="Previous review">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M15 18l-6-6 6-6"/>
-                </svg>
-            </button>
-            
-            <div class="ctrw-slider-dots">
-                <?php for ($i = 0; $i < count($reviews); $i++) : ?>
-                    <button class="ctrw-slider-dot <?php echo $i === 0 ? 'ctrw-slider-active' : ''; ?>" data-index="<?php echo $i; ?>" aria-label="Go to review <?php echo $i + 1; ?>"></button>
-                <?php endfor; ?>
-            </div>
-            
-            <button class="ctrw-slider-next" aria-label="Next review">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M9 18l6-6-6-6"/>
-                </svg>
-            </button>
-        </div>
-    </div>
+   /* ========== Slider Wrapper ========== */
+   .ctrw-slider-wrapper {
+       overflow: hidden;
+   }
+
+   /* ========== Slides Track ========== */
+   .ctrw-slider-slides {
+       display: flex;
+       transition: transform 0.5s cubic-bezier(0.25, 0.8, 0.25, 1);
+       gap: 20px;
+   }
+  
+   /* Centering logic for fewer reviews than the viewport can show */
+   .ctrw-slider-slides.center-items {
+       justify-content: center;
+   }
+
+   /* When centered, prevent individual slides from growing and set a max-width for consistency */
+   .ctrw-slider-slides.center-items .ctrw-slider-slide {
+       flex-grow: 0;
+       max-width: 380px; /* Ensures consistent and pleasant card width */
+   }
+
+
+   /* ========== Individual Slide/Card ========== */
+   .ctrw-slider-slide {
+       min-width: calc((100% - 40px) / 3); /* (100% - total_gap) / num_slides */
+       background: #fff;
+       border-radius: 12px;
+       border: 1px solid #e5e7eb;
+       box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+       padding: 25px;
+       box-sizing: border-box;
+       display: flex;
+       flex-direction: column;
+   }
+
+   /* ========== Card Content ========== */
+   .ctrw-slider-meta {
+       display: flex;
+       align-items: center;
+       gap: 12px;
+       margin-bottom: 15px;
+   }
+
+   .ctrw-reviewer-avatar {
+       width: 44px;
+       height: 44px;
+       border-radius: 50%;
+       display: flex;
+       align-items: center;
+       justify-content: center;
+       font-weight: 600;
+       font-size: 16px;
+       flex-shrink: 0;
+       background-color: #0073aa;
+       color: #fff;
+   }
+
+   .ctrw-slider-author-info {
+       flex-grow: 1;
+   }
+
+   .ctrw-slider-author-name {
+       font-weight: 600;
+       font-size: 16px;
+       color: #111;
+   }
+  
+   .ctrw-slider-date {
+       font-size: 14px;
+       color: #777;
+   }
+
+   .ctrw-slider-rating-wrapper {
+       display: flex;
+       align-items: center;
+       gap: 8px;
+       margin-bottom: 15px;
+   }
+
+   .ctrw-slider-rating {
+       color: #FFC107;
+       font-size: 18px;
+   }
+  
+   .ctrw-verified-icon {
+       width: 18px;
+       height: 18px;
+       color: #0073aa;
+   }
+
+   .ctrw-slider-content {
+       font-size: 15px;
+       line-height: 1.6;
+       color: #444;
+       flex-grow: 1;
+       overflow: hidden;
+       max-height: 120px; /* Approx 5 lines */
+       position: relative;
+   }
+  
+   .ctrw-slider-content.expanded {
+       max-height: none;
+   }
+  
+   .ctrw-read-more {
+       background: none;
+       border: none;
+       color: #0073aa;
+       font-weight: 600;
+       cursor: pointer;
+       padding: 5px 0 0;
+       font-size: 14px;
+       margin-top: 10px;
+   }
+
+   /* ========== Slider Controls ========== */
+   .ctrw-slider-controls {
+       display: flex;
+       justify-content: center;
+       align-items: center;
+       gap: 15px;
+       margin-top: 30px;
+   }
+
+   .ctrw-slider-prev,
+   .ctrw-slider-next {
+       position: static;
+       transform: none;
+       background: #fff;
+       color: #333;
+       border: 1px solid #e0e0e0;
+       border-radius: 50%;
+       width: 40px;
+       height: 40px;
+       cursor: pointer;
+       display: flex;
+       align-items: center;
+       justify-content: center;
+       box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+       transition: all 0.2s ease;
+       flex-shrink: 0;
+   }
+
+   .ctrw-slider-prev:hover,
+   .ctrw-slider-next:hover {
+       background: #f5f5f5;
+       transform: scale(1.05);
+   }
+  
+   .ctrw-slider-controls-dots {
+       display: flex;
+       align-items: center;
+       gap: 8px;
+   }
+
+   .ctrw-slider-dot {
+       display: inline-block;
+       width: 10px;
+       height: 12px;
+       background: #ccc;
+       border-radius: 50%;
+       border: none;
+       margin: 0;
+       cursor: pointer;
+       transition: background 0.3s;
+   }
+
+   .ctrw-slider-dot.ctrw-slider-active {
+       background: #0073aa;
+   }
+
+   /* ========== Responsive Adjustments ========== */
+   @media (max-width: 992px) {
+       .ctrw-slider-slide {
+           min-width: calc((100% - 20px) / 2); /* 2 slides */
+       }
+   }
+
+   @media (max-width: 768px) {
+       .ctrw-slider-container {
+           padding: 0 20px;
+       }
+       .ctrw-slider-slide {
+           min-width: 100%; /* 1 slide */
+       }
+   }
+</style>
+
+<div class="ctrw-slider-container">
+
+
+   <div class="ctrw-slider-navigation-wrapper">
+       <div class="ctrw-slider-wrapper">
+           <div class="ctrw-slider-slides <?php if ($review_count < 3) echo 'center-items'; ?>">
+               <?php
+               foreach ($reviews as $review) {
+                   // Settings for each review
+                   $show_city = !empty($settings['show_city']);
+                   $date_format_setting = $settings['date_format'] ?? 'MM/DD/YYYY';
+                   $formatted_date = '';
+                   if (!empty($review->created_at)) {
+                       $timestamp = strtotime($review->created_at);
+                       $date_format = str_replace(['MM', 'DD', 'YYYY'], ['m', 'd', 'Y'], $date_format_setting);
+                       $formatted_date = date($date_format, $timestamp);
+                   }
+               ?>
+               <div class="ctrw-slider-slide">
+                   <div class="ctrw-slider-meta">
+                  
+                       <div class="ctrw-slider-author-info">
+                           <div class="ctrw-slider-author-name"><?= esc_html($review->name); ?></div>
+                           <div class="ctrw-slider-date"><?= esc_html($formatted_date); ?></div>
+                          
+
+                       </div>
+                   </div>
+                  
+                   <div class="ctrw-slider-rating-wrapper">
+                       <div class="ctrw-slider-rating" aria-label="Rating: <?php echo (int) $review->rating; ?> out of 5 stars">
+                           <?php for ($i = 0; $i < 5; $i++) : ?>
+                               <span class="<?php echo $i < $review->rating ? 'filled' : 'empty'; ?>">&#9733;</span>
+                           <?php endfor; ?>
+                       </div>
+                       <svg class="ctrw-verified-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1.41 14.59L6.17 13.17l1.41-1.41L10.59 14.17l5.83-5.83 1.41 1.41-7.24 7.24z"></path></svg>
+                   </div>
+                  
+                   <div class="ctrw-slider-content">
+                       <p><?= esc_html($review->comment); ?></p>
+                   </div>
+               </div>
+               <?php } ?>
+           </div>
+       </div>
+   </div>
+
+   <?php if ($review_count > 1): ?>
+   <div class="ctrw-slider-controls">
+       <button class="ctrw-slider-prev" aria-label="Previous review">&#10094;</button>
+       <div class="ctrw-slider-controls-dots">
+           <!-- Dots are dynamically generated by JavaScript -->
+       </div>
+       <button class="ctrw-slider-next" aria-label="Next review">&#10095;</button>
+   </div>
+   <?php endif; ?>
 </div>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const sliderContainers = document.querySelectorAll('.ctrw-slider-container');
-        
-        sliderContainers.forEach(container => {
-            const slidesContainer = container.querySelector('.ctrw-slider-slides');
-            const slides = container.querySelectorAll('.ctrw-slider-slide');
-            const prevButton = container.querySelector('.ctrw-slider-prev');
-            const nextButton = container.querySelector('.ctrw-slider-next');
-            const dots = container.querySelectorAll('.ctrw-slider-dot');
-            let currentIndex = 0;
-            
-            // Get horizontal count from data attribute or default to 3
-            const horizontalCount = parseInt(container.dataset.horizontalCount) || 3;
-            
-            function updateSliderPosition() {
-                if (slides.length === 0) return;
-                
-                const slideWidth = slides[0].offsetWidth + 20; // 20 = gap
-                const offset = currentIndex * slideWidth * horizontalCount;
-                slidesContainer.style.transform = `translateX(-${offset}px)`;
-                
-                dots.forEach(dot => dot.classList.remove('ctrw-slider-active'));
-                if (dots[currentIndex]) {
-                    dots[currentIndex].classList.add('ctrw-slider-active');
-                }
-                
-                // Update slide widths based on horizontal count
-                const slidePercentage = 100 / horizontalCount;
-                slides.forEach(slide => {
-                    slide.style.minWidth = `calc(${slidePercentage}% - 20px)`;
-                });
-            }
-            
-            function visibleSlides() {
-                if (window.innerWidth <= 600) return 1;
-                if (window.innerWidth <= 992) return Math.min(2, horizontalCount);
-                return horizontalCount;
-            }
-            
-            prevButton?.addEventListener('click', () => {
-                currentIndex = Math.max(currentIndex - 1, 0);
-                updateSliderPosition();
-            });
-            
-            nextButton?.addEventListener('click', () => {
-                const maxIndex = Math.max(slides.length - visibleSlides(), 0);
-                currentIndex = Math.min(currentIndex + 1, maxIndex);
-                updateSliderPosition();
-            });
-            
-            dots.forEach(dot => {
-                dot.addEventListener('click', (e) => {
-                    const index = parseInt(e.target.dataset.index);
-                    currentIndex = index;
-                    updateSliderPosition();
-                });
-            });
-            
-            window.addEventListener('resize', updateSliderPosition);
-            updateSliderPosition();
-        });
-    });
+document.addEventListener('DOMContentLoaded', function () {
+   const container = document.querySelector('.ctrw-slider-container');
+   if (!container) return;
+
+   const slidesContainer = container.querySelector('.ctrw-slider-slides');
+   const slides = container.querySelectorAll('.ctrw-slider-slide');
+   const prevButton = container.querySelector('.ctrw-slider-prev');
+   const nextButton = container.querySelector('.ctrw-slider-next');
+   const dotsContainer = container.querySelector('.ctrw-slider-controls-dots');
+   const controlsContainer = container.querySelector('.ctrw-slider-controls');
+  
+   if (slides.length === 0) return; // Exit if no reviews
+
+   let currentIndex = 0;
+   const slideCount = slides.length;
+
+   const getVisibleSlides = () => {
+       if (window.innerWidth <= 768) return 1;
+       if (window.innerWidth <= 992) return 2;
+       return 3;
+   };
+
+   function updateSlider() {
+       const visibleSlides = getVisibleSlides();
+       const maxIndex = Math.max(0, slideCount - visibleSlides);
+       const pages = maxIndex + 1;
+
+       // Clamp currentIndex to be within valid bounds
+       currentIndex = Math.max(0, Math.min(currentIndex, maxIndex));
+
+       const slideWidth = slides.length > 0 ? slides[0].offsetWidth : 0;
+       const gap = 20;
+       const offset = currentIndex * (slideWidth + gap);
+       slidesContainer.style.transform = `translateX(-${offset}px)`;
+
+       // Dynamically create and update dots
+       if (dotsContainer) {
+           dotsContainer.innerHTML = ''; // Clear existing dots
+           if (pages > 1) { // Only show dots if there's more than one page
+               for (let i = 0; i < pages; i++) {
+                   const dot = document.createElement('button');
+                   dot.classList.add('ctrw-slider-dot');
+                   if (i === currentIndex) {
+                       dot.classList.add('ctrw-slider-active');
+                   }
+                   dot.dataset.index = i;
+                   dot.setAttribute('aria-label', `Go to slide ${i + 1}`);
+                   dot.addEventListener('click', () => {
+                       currentIndex = i;
+                       updateSlider();
+                   });
+                   dotsContainer.appendChild(dot);
+               }
+           }
+       }
+
+       // Update button states
+       if (prevButton) prevButton.disabled = currentIndex === 0;
+       if (nextButton) nextButton.disabled = currentIndex === maxIndex;
+
+       // Hide controls if all slides are visible
+       const controlsVisible = slideCount > visibleSlides;
+       if (controlsContainer) {
+           controlsContainer.style.display = controlsVisible ? 'flex' : 'none';
+       }
+       slidesContainer.classList.toggle('center-items', !controlsVisible);
+   }
+  
+   // "Read More" functionality
+   slides.forEach(slide => {
+       const content = slide.querySelector('.ctrw-slider-content');
+       if (content.scrollHeight > content.clientHeight) {
+           const readMoreBtn = document.createElement('button');
+           readMoreBtn.textContent = 'Read more';
+           readMoreBtn.className = 'ctrw-read-more';
+           slide.appendChild(readMoreBtn);
+
+           readMoreBtn.addEventListener('click', () => {
+               content.classList.toggle('expanded');
+               readMoreBtn.textContent = content.classList.contains('expanded') ? 'Read less' : 'Read more';
+           });
+       }
+   });
+
+   // Event Listeners
+   if (nextButton) {
+       nextButton.addEventListener('click', () => {
+           currentIndex++;
+           updateSlider();
+       });
+   }
+
+   if (prevButton) {
+       prevButton.addEventListener('click', () => {
+           currentIndex--;
+           updateSlider();
+       });
+   }
+
+   window.addEventListener('resize', updateSlider);
+
+   // Initial setup
+   updateSlider();
+});
 </script>
+
+
