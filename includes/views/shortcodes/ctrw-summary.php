@@ -83,9 +83,9 @@ if ($total_reviews > 0) {
 
 .review-header {
     text-align: center;
-    font-size: 1.25rem;
+    font-size: 20pt;
     font-weight: 600;
-    margin-bottom: 20px;
+    margin-bottom: 10px;
 }
 
 .review-content {
@@ -110,12 +110,11 @@ if ($total_reviews > 0) {
 }
 
 .average-rating-score .max-score {
-    font-size: 1.5rem;
+    font-size: 24pt;
     color: #9e9e9e;
     font-weight: normal;
     margin-left: 4px;
 }
-
 .star-display {
     font-size: 1.5rem;
     margin-top: 8px;

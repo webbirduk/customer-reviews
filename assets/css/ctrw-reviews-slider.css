@@ -34,11 +34,12 @@
         gap: 15px;
     }
 
-    .ctrw-slider-meta {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-    }
+.ctrw-slider-meta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 3px;
+}
 
     .ctrw-reviewer-avatar {
         width: 40px;

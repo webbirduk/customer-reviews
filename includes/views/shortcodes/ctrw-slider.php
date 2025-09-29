@@ -109,12 +109,12 @@ $review_count = count($reviews);
    }
 
    /* ========== Card Content ========== */
-   .ctrw-slider-meta {
-       display: flex;
-       align-items: center;
-       gap: 12px;
-       margin-bottom: 15px;
-   }
+.ctrw-slider-rating-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 3px;
+}
 
    .ctrw-reviewer-avatar {
        width: 44px;
@@ -134,11 +134,11 @@ $review_count = count($reviews);
        flex-grow: 1;
    }
 
-   .ctrw-slider-author-name {
+  .ctrw-slider-author-name {
        font-weight: 600;
-       font-size: 16px;
+       font-size: 18px;
        color: #111;
-   }
+    }
   
    .ctrw-slider-date {
        font-size: 14px;
@@ -178,15 +178,16 @@ $review_count = count($reviews);
    }
   
    .ctrw-read-more {
-       background: none;
+       background: #e9e9e9;
        border: none;
        color: #0073aa;
        font-weight: 600;
        cursor: pointer;
-       padding: 5px 0 0;
+       padding: 15px 15px 15px 15px;
        font-size: 14px;
        margin-top: 10px;
-   }
+       border-radius: 4px
+    }
 
    /* ========== Slider Controls ========== */
    .ctrw-slider-controls {
