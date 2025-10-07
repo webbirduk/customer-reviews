@@ -4,8 +4,7 @@ if (!defined('ABSPATH')) {
 }
 $reviews = (new CTRW_Model())->get_reviews('approved');
 $settings = get_option('customer_reviews_settings');
-$reviews_per_page = $settings['reviews_per_page'] ?? 5;
-$display_reviews = array_slice($reviews, 0, $reviews_per_page);
+// We will now display all reviews, so the lines for pagination are removed.
 ?>
 
 <div class="ctrw-floating-widget">
@@ -13,7 +12,7 @@ $display_reviews = array_slice($reviews, 0, $reviews_per_page);
         <div class="ctrw-tab-content">
             <span class="ctrw-tab-icon">★</span>
             <span class="ctrw-tab-text">Reviews</span>
-            <span class="ctrw-tab-count"><?= count($display_reviews) ?></span>
+            <span class="ctrw-tab-count"><?= count($reviews) ?></span>
         </div>
     </div>
     
@@ -32,7 +31,7 @@ $display_reviews = array_slice($reviews, 0, $reviews_per_page);
             </div>
             
             <div class="ctrw-reviews-list">
-                <?php foreach ($display_reviews as $review) : 
+                <?php foreach ($reviews as $review) : 
                     $timestamp = strtotime($review->created_at);
                     $formatted_date = date('m/d/Y', $timestamp);
                     if ($settings['include_time'] ?? false) {
@@ -92,16 +91,6 @@ $display_reviews = array_slice($reviews, 0, $reviews_per_page);
                 <?php endforeach; ?>
             </div>
             
-            <?php if (count($reviews) > $reviews_per_page): ?>
-                <div class="ctrw-reviews-footer">
-                    <button class="ctrw-view-all-btn">
-                        View All Reviews
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                    </button>
-                </div>
-            <?php endif; ?>
-        </div>
+            </div>
     </div>
 </div>
