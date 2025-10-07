@@ -2,7 +2,7 @@
 if (!defined('ABSPATH')) {
     exit;
 }
-$reviews = (new CTRW_Review_Model())->get_reviews('approved');
+$reviews = (new CTRW_Model())->get_reviews('approved');
 $settings = get_option('customer_reviews_settings');
 $reviews_per_page = $settings['reviews_per_page'] ?? 5;
 $display_reviews = array_slice($reviews, 0, $reviews_per_page);

@@ -3,13 +3,13 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-class Review_Controller {
+class CTRW_Controller {
     private $model;
     private $view;
 
     public function __construct() {
-        $this->model = new CTRW_Review_Model();
-        $this->view = new Review_View();
+        $this->model = new CTRW_Model();
+        $this->view = new CTRW_View();
         
         // Initialize hooks
         $this->initialize_hooks();

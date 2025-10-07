@@ -3,7 +3,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-class Review_View {
+class CTRW_View {
     
     public function display_reviews($reviews, $counts, $current_status) {
 

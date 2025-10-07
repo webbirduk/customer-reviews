@@ -3,7 +3,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-class CTRW_Review_Model {
+class CTRW_Model {
 
     private $wpdb;
     private $table;

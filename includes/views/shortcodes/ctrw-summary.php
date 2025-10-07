@@ -2,7 +2,7 @@
 if (!defined('ABSPATH')) {
     exit;
 }
-$reviews = (new CTRW_Review_Model())->get_reviews('approved');
+$reviews = (new CTRW_Model())->get_reviews('approved');
 $settings = get_option('customer_reviews_settings');
 
 // Calculate average rating and rating counts

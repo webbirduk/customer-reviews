@@ -30,10 +30,10 @@ include_once CTRW_PLUGIN_PATH . 'includes/ctrw-model.php';
 include_once CTRW_PLUGIN_PATH . 'includes/ctrw-controller.php';
 
 // Activation and Uninstall Hooks - must be static
-register_activation_hook(__FILE__, ['Review_Controller', 'activate']);
-register_uninstall_hook(__FILE__, ['Review_Controller', 'uninstall']);
+register_activation_hook(__FILE__, ['CTRW_Controller', 'activate']);
+register_uninstall_hook(__FILE__, ['CTRW_Controller', 'uninstall']);
 
 // Instantiate the controller to get everything running for regular operations
-new Review_Controller();
+new CTRW_Controller();
 
 ?>

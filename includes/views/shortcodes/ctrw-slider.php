@@ -12,7 +12,7 @@ if (!defined('ABSPATH')) {
 }
 
 // Fetch approved reviews from the database model.
-$reviews_model = new CTRW_Review_Model();
+$reviews_model = new CTRW_Model();
 $reviews = $reviews_model->get_reviews('approved');
 
 // Get plugin settings to determine how many reviews to show.

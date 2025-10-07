@@ -19,7 +19,7 @@ if (defined('DOING_AJAX') && DOING_AJAX) {
 }
 
 // Get all approved reviews from the database.
-$all_reviews = (new CTRW_Review_Model())->get_reviews('approved');
+$all_reviews = (new CTRW_Model())->get_reviews('approved');
 
 // Filter the reviews to only include those for the current post/page.
 $filtered_reviews = [];
