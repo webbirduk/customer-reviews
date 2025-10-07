@@ -1,19 +1,61 @@
 jQuery(document).ready(function($) {
 
-    $('#star_color').on('input', function() {
-        $(this).attr('value', $(this).val());
+    // Initialize color pickers on the settings page
+    if ($('#star_color').length) {
+        $('#star_color').wpColorPicker();
+    }
+    if ($('#comment_box_fill_color').length) {
+        $('#comment_box_fill_color').wpColorPicker();
+    }
+
+    // Reply popup logic
+    $('.reply-now').on('click', function() {
+        $('#reply-review-id').val($(this).data('review-id'));
+        $('#reply-review-author').text($(this).data('review-author'));
+        $('#reply-message').val($(this).data('reply-message') || '');
+        $('#cr-reply-popup').show();
     });
 
-      $('.reply-now').on('click', function() {
+    $('#close-reply-popup').on('click', function() {
+        $('#cr-reply-popup').hide();
+    });
 
-      $('#reply-review-id').val($(this).data('review-id'));
-      $('#reply-review-author').text($(this).data('review-author'));
-      $('#reply-message').val($(this).data('reply-message') || '');
-      $('#cr-reply-popup').show();
-      });
+    $('#reply-form').on('submit', function(event) {
+        event.preventDefault();
+        let reviewId = $('#reply-review-id').val();
+        let replyMessage = $('#reply-message').val();
 
+        if (!replyMessage.trim()) {
+            alert('Reply message cannot be empty.');
+            return;
+        }
+
+        $.ajax({
+            url: ctrw_admin_ajax.ajax_url, 
+            method: 'POST',
+            data: {
+                action: 'save_review_reply',
+                review_id: reviewId,
+                reply_message: replyMessage,
+                security: ctrw_admin_ajax.nonce 
+            },
+            success: function(response) {
+                if (response.success) {
+                    alert('Reply submitted successfully.');
+                    $('#cr-reply-popup').hide();
+                    location.reload();
+                } else {
+                    alert('Failed to submit reply.');
+                }
+            },
+            error: function() {
+                alert('An error occurred while submitting the reply.');
+            }
+        });
+    });
+
+    // Edit review popup logic
     $('.edit-review').on('click', function() {
-      
         $('#edit-review-id').val($(this).data('review-id'));
         $('#update-type').val($(this).data('update-type'));
         $('#edit-review-name').val($(this).data('review-author'));
@@ -27,7 +69,6 @@ jQuery(document).ready(function($) {
         $('#edit-review-rating').val($(this).data('review-rating'));
         $('#edit-review-title').val($(this).data('review-title'));
         $('#edit-review-positionid').val($(this).data('review-positionid'));
-
         $('#cr-edit-review-popup').show();
     });
 
@@ -35,55 +76,35 @@ jQuery(document).ready(function($) {
         $('#cr-edit-review-popup').hide();
     });
 
-    $('#update-customer-review').on('click', function(event) {
-        
-        // Prevent the default form submission
+    $('#edit-review-form').on('submit', function(event) {
         event.preventDefault();
-       
-        let reviewId = $('#edit-review-id').val();
-        let updateType = $('#update-type').val();
-        let reviewName = $('#edit-review-name').val();
-        let reviewEmail = $('#edit-review-email').val();
-        let reviewPhone = $('#edit-review-phone').val();
-        let reviewWebsite = $('#edit-review-website').val();
-        let reviewComment = $('#edit-review-comment').val();
-        let reviewCity = $('#edit-review-city').val();
-        let reviewState = $('#edit-review-state').val();
-        let reviewStatus = $('#edit-review-status').val();
-        let reviewRating = $('#edit-review-rating').val();
-        let reviewTitle = $('#edit-review-title').val();
-        let reviewPositionId = $('#edit-review-positionid').val();
-        
-
-
         $.ajax({
             url: ctrw_admin_ajax.ajax_url,
             method: 'POST',
             data: {
                 action: 'edit_customer_review',
-                id: reviewId,
-                update_type: updateType,
-                name: reviewName,
-                email: reviewEmail,
-                phone: reviewPhone,
-                website: reviewWebsite,
-                comment: reviewComment,
-                city: reviewCity,
-                state: reviewState,
-                status: reviewStatus,
-                rating: reviewRating,
-                title: reviewTitle,
-                positionid: reviewPositionId
+                id: $('#edit-review-id').val(),
+                update_type: $('#update-type').val(),
+                name: $('#edit-review-name').val(),
+                email: $('#edit-review-email').val(),
+                phone: $('#edit-review-phone').val(),
+                website: $('#edit-review-website').val(),
+                comment: $('#edit-review-comment').val(),
+                city: $('#edit-review-city').val(),
+                state: $('#edit-review-state').val(),
+                status: $('#edit-review-status').val(),
+                rating: $('#edit-review-rating').val(),
+                title: $('#edit-review-title').val(),
+                positionid: $('#edit-review-positionid').val(),
+                security: ctrw_admin_ajax.nonce
             },
             success: function(response) {
-                 console.log(response.data);
                 if (response.success) {
                     alert('Review updated successfully.');
                     $('#cr-edit-review-popup').hide();
                     location.reload();
                 } else {
-                    console.log(response.data);
-                    alert('Failed to update review: ' + response.data);
+                    alert('Failed to update review.');
                 }
             },
             error: function() {
@@ -92,29 +113,34 @@ jQuery(document).ready(function($) {
         });
     });
 
-      $('#close-reply-popup').on('click', function() {
-      $('#cr-reply-popup').hide();
-      });
+    // Import popup logic
+    $('#import-customer-reviews').on('click', function() {
+        $('#ctrw-import-popup').show();
+    });
+
+    $('#close-ctrw-import-popup').on('click', function() {
+        $('#ctrw-import-popup').hide();
+    });
 
     $('#ctrw-import-form').on('submit', function(event) {
         event.preventDefault();
-
-        
         let selectedPlugin = $('#ctrw_import_plugin').val();
         $.ajax({
             url: ctrw_admin_ajax.ajax_url,
             method: 'POST',
             data: {
-              action: 'ctrw_import_review_from_others',
-              ctrw_import_review: selectedPlugin,
-           },
+                action: 'ctrw_import_review_from_others',
+                ctrw_import_review: selectedPlugin,
+                security: ctrw_admin_ajax.nonce
+            },
             success: function(response) {
-                console.log(response);
                 if (response.success) {
-                    alert('Imports completed successfully.');
+                    alert(response.data.message || 'Imports completed successfully.');
                     $('#ctrw-import-popup').hide();
-                   
-                } 
+                    location.reload();
+                } else {
+                     alert(response.data.message || 'Failed to import reviews.');
+                }
             },
             error: function() {
                 alert('An error occurred during import.');
@@ -122,113 +148,90 @@ jQuery(document).ready(function($) {
         });
     });
 
-    $('#close-ctrw-import-popup').on('click', function() {
-        $('#ctrw-import-popup').hide();
+    // Bulk action select-all checkbox
+    $('#select-all').on('click', function() {
+        let isChecked = $(this).prop('checked');
+        $('input[name="review_ids[]"]').prop('checked', isChecked);
     });
 
-      $('#reply-form').on('submit', function(event) {
-      event.preventDefault();
-
-      let reviewId = $('#reply-review-id').val();
-      let replyMessage = $('#reply-message').val();
-
-      if (!replyMessage.trim()) {
-          alert('Reply message cannot be empty.');
-          return;
-      }
-
-      $.ajax({
-          url: ctrw_admin_ajax.ajax_url, 
-          method: 'POST',
-          data: {
-              action: 'save_review_reply',
-              review_id: reviewId,
-              reply_message: replyMessage
-          },
-          success: function(response) {
-              if (response.success) {
-                  alert('Reply submitted successfully.');
-                  $('#cr-reply-popup').hide();
-              location.reload();
-              } else {
-                  alert('Failed to submit reply: ' + response.data);
-              }
-          },
-          error: function() {
-              alert('An error occurred while submitting the reply.');
-          }
-      });
-      });
-
-      $('#select-all').on('click', function() {
-      let isChecked = $(this).prop('checked');
-      $('input[name=\"review_ids[]\"]').prop('checked', isChecked);
-      });
-    $('#import-customer-reviews').on('click', function() {
-       
-        $('#ctrw-import-popup').show();
+    // NEW: Settings page tab functionality
+    $('.nav-tab-wrapper .nav-tab').on('click', function(e) {
+        e.preventDefault();
+        
+        // Handle active states
+        $('.nav-tab-wrapper .nav-tab').removeClass('nav-tab-active');
+        $(this).addClass('nav-tab-active');
+        
+        // Show/hide tab content
+        var tabId = $(this).data('tab');
+        $('.tab-section').hide();
+        $('#tab-' + tabId).show();
     });
 
 
-
-      $('#ctrw-general-tab, #ctrw-review-form-tab, #ctrw-advanced-tab, #ctrw-shortcodes-tab').on('click', function(e) {
-    e.preventDefault();
-    let tabId = $(this).attr('id');
-    let tabName = '';
-    if (tabId === 'ctrw-general-tab') tabName = 'general';
-    else if (tabId === 'ctrw-review-form-tab') tabName = 'review_form';
-    else if (tabId === 'ctrw-advanced-tab') tabName = 'advanced';
-    else if (tabId === 'ctrw-shortcodes-tab') tabName = 'shortcodes';
-    $('#ctrw-active-tab').val(tabName);
-});
-
-    $('#review_display_type').on('change', function() {
-        var infoText = '';
-        switch ($(this).val()) {
-            case 'list':
-                infoText = 'Displays reviews in a standard list format on the product page.';
-                break;
-            case 'slider':
-                infoText = 'Displays reviews in a slider/carousel on the product page.';
-                break;
-            case 'floating':
-                infoText = 'Displays reviews in a floating widget on the product page.';
-                break;
-        }
-        $('#review_display_info').text(infoText);
-    });
-
-
-        $('#ctrw-form-settings').on('submit', function(e) {
-            e.preventDefault();
-            
-            // Get form data
-            var formData = $(this).serialize();
-            
-            // Add security nonce using your existing object
-            formData += '&security=' + ctrw_admin_ajax.nonce;
-            
-            // Add action
-            formData += '&action=ctrw_save_settings';            
-            // AJAX request
-            $.ajax({
-                type: 'POST',
-                url: ctrw_admin_ajax.ajax_url, // Note: ajax_url instead of ajaxurl
-                data: formData,
-                success: function(response) {
-                   
-                    $('#ctrw-success-msg').fadeIn().delay(2000).fadeOut();
-                
-                }
-            });
+    $('#ctrw-form-settings').on('submit', function(e) {
+        e.preventDefault();
+        var formData = $(this).serialize();
+        formData += '&security=' + ctrw_admin_ajax.nonce;
+        formData += '&action=ctrw_save_settings';            
+        $.ajax({
+            type: 'POST',
+            url: ctrw_admin_ajax.ajax_url,
+            data: formData,
+            success: function(response) {
+                $('#ctrw-success-msg').fadeIn().delay(2000).fadeOut();
+            },
+            error: function() {
+                 $('#ctrw-error-msg').fadeIn().delay(3000).fadeOut();
+            }
         });
+    });
+    
+    // Shortcode copy button functionality
+    $('.copy-button').on('click', function() {
+        var textToCopy = $(this).data('clipboard-text');
+        navigator.clipboard.writeText(textToCopy).then(() => {
+            // Optional: give user feedback
+            var originalText = $(this).text();
+            $(this).text('Copied!');
+            setTimeout(() => {
+                $(this).text(originalText);
+            }, 1500);
+        });
+    });
 
 
-  });
+    // Column visibility toggling for the reviews list table
+    function ctrw_toggle_columns() {
+        $('.ctrw-toggle-col').each(function() {
+            var col = $(this).data('col');
+            var checked = $(this).is(':checked');
+            var idx = {
+                'review-title': 2, 'author': 3, 'rating': 4, 'review': 5,
+                'admin-reply': 6, 'status': 7, 'action': 8
+            }[col];
+            if (idx) {
+                $('.wp-list-table th:nth-child(' + idx + '), .wp-list-table td:nth-child(' + idx + ')')
+                    .toggle(checked);
+            }
+        });
+    }
 
+    // Bind change event to the checkboxes in Screen Options
+    $(document).on('change', '.ctrw-toggle-col', function() {
+        ctrw_toggle_columns();
+        var data = {};
+        $('.ctrw-toggle-col').each(function() {
+            data[$(this).data('col')] = $(this).is(':checked') ? 1 : 0;
+        });
+        // Save the setting via AJAX
+        $.post(ajaxurl, { 
+            action: 'ctrw_save_column_visibility', 
+            columns: data, 
+            _wpnonce: ctrw_admin_ajax.nonce // Use the localized nonce
+        });
+    });
 
-
-
-
-// Example usage: Add this to an element in your HTML
-// <a href="#" onclick="showTab(event, 'general')">General</a>
+    // Run on page load to apply saved settings
+    ctrw_toggle_columns();
+});

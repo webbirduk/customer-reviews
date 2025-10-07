@@ -86,7 +86,7 @@
     }
 
     .ctrw-slider-content {
-        max-width: 255px;
+        max-width: 100%;
     }
 
     .ctrw-slider-content p {

@@ -301,6 +301,7 @@ $review_count = count($reviews);
                    </div>
                   
                    <div class="ctrw-slider-content">
+                      <div class="ctrw-review-title"><?= esc_html($review->title); ?></div>
                        <p><?= esc_html($review->comment); ?></p>
                    </div>
                </div>

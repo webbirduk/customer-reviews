@@ -4,21 +4,18 @@
     
  
     <h2 class="nav-tab-wrapper">
-        <a href="#" id="ctrw-general-tab" class="nav-tab nav-tab-active" onclick="showTab(event, 'general')">General</a>
-        <a href="#" id="ctrw-review-form-tab"class="nav-tab " onclick="showTab(event, 'review_form')">Review Form Settings</a>
-        <a href="#" id="ctrw-shortcodes-tab"class="nav-tab " onclick="showTab(event, 'display')">Shortcodes</a>
-        <a href="#" id="ctrw-schema-tab" class="nav-tab " onclick="showTab(event, 'schema')">Schema Settings</a>
-        <a href="#" id="ctrw-advanced-tab" class="nav-tab " onclick="showTab(event, 'advanced')">Advanced Settings</a>
-
+        <a href="#" id="ctrw-general-tab" class="nav-tab nav-tab-active" data-tab="general">General</a>
+        <a href="#" id="ctrw-review-form-tab"class="nav-tab" data-tab="review_form">Review Form Settings</a>
+        <a href="#" id="ctrw-shortcodes-tab"class="nav-tab" data-tab="display">Shortcodes</a>
+        <a href="#" id="ctrw-schema-tab" class="nav-tab" data-tab="schema">Schema Settings</a>
+        <a href="#" id="ctrw-advanced-tab" class="nav-tab" data-tab="advanced">Advanced Settings</a>
     </h2>
 
-    <!-- Success message -->
     <div id="ctrw-success-msg" class="notice notice-success is-dismissible" style="display: none;">
         <p>Customer Review Settings Saved Successfully.</p>
     </div>
 
     <form method="post"  id="ctrw-form-settings" class="wp-review-settings-form">
-        <!-- General Settings -->
         <div class="form-group tab-section" id="tab-general" >
             <h3><?php esc_html_e('General Settings', 'wp_cr'); ?></h3>
             <div style="display: flex; flex-wrap: wrap; gap: 24px;">
@@ -139,11 +136,6 @@
 
                     <label for="comment_box_fill_color"><?php esc_html_e('Comment Box Fill Color:', 'wp_cr'); ?></label>
                     <?php
-                    // Enqueue WordPress color picker scripts/styles
-                    if (function_exists('wp_enqueue_style')) {
-                        wp_enqueue_style('wp-color-picker');
-                        wp_enqueue_script('wp-color-picker');
-                    }
                     $comment_box_fill_color = get_option('customer_reviews_settings')['comment_box_fill_color'] ?? '#f5f5f5';
                     ?>
                     <input type="text" name="comment_box_fill_color" id="comment_box_fill_color"
@@ -155,32 +147,23 @@
                     ?>
                     <input type="text" name="star_color" id="star_color"
                         value="<?= esc_attr($star_color) ?>" class="wp-color-picker-field" data-default-color="#fbbc04">
-                    <script>
-                    jQuery(document).ready(function($){
-                        $('#star_color').wpColorPicker();
-                        $('#comment_box_fill_color').wpColorPicker();
-                    });
-                    </script>
-
-
 
                 </div>
             </div>
         </div>
 
-       <!-- Review Form Settings -->
-        <div class="tab-section" id="tab-review_form" style="display:none">
+       <div class="tab-section" id="tab-review_form" style="display:none">
             <h3><?php esc_html_e('Review Form Fields Settings', 'wp_cr'); ?></h3>
             
             <div class="ctrw-settings-fields-grid" style="display: flex; gap: 32px;">
                 <?php 
                 $fields = ['Name', 'Email', 'Website', 'Phone', 'City', 'State', 'Review Title', 'Comment', 'Rating'];
                 $fields_col1 = array_slice($fields, 0, 6);
-                $fields_col2 = array_slice($fields, 6, 4);
+                $fields_col2 = array_slice($fields, 6, 3);
                 ?>
                 <div style="flex:1; min-width:220px;">
                     <?php foreach ($fields_col1 as $field): 
-                        $settings = get_option('customer_reviews_settings')['fields'][$field] ?? [];
+                        $settings = get_option('customer_reviews_settings')['fields'][$field] ?? ['show' => 1, 'require' => 0];
                     ?>
                         <div class="ctrw-settings-field-row">
                             <input type="text" 
@@ -209,10 +192,10 @@
                 </div>
                 <div style="flex:1; min-width:220px;">
                     <?php foreach ($fields_col2 as $field): 
-                        $settings = get_option('customer_reviews_settings')['fields'][$field] ?? [];
+                        $settings = get_option('customer_reviews_settings')['fields'][$field] ?? ['show' => 1, 'require' => 0];
                     ?>
                         <div class="ctrw-settings-field-row">
-                            <input type="text" 
+                             <input type="text" 
                                 name="fields[<?= esc_attr($field) ?>][label]" 
                                 value="<?= esc_attr($settings['label'] ?? $field) ?>" 
                                 placeholder="<?= esc_attr($field) ?>"
@@ -239,33 +222,32 @@
             </div>
         </div>
 
-        <!-- Shortcodes -->
         <div class="form-group tab-section" id="tab-display" style="display:none">
             <h3><?php esc_html_e('Shortcodes', 'wp_cr'); ?></h3>
             <div class="shortcode-section">
-                <label for="shortcode">Reviews Form:</label>
-                <input type="text" id="shortcode" value="[wp_ctrw_form]" readonly>
-                <button type="button" class="copy-button" onclick="navigator.clipboard.writeText('[wp_ctrw_form]')">Copy</button>
+                <label for="shortcode-form">Reviews Form:</label>
+                <input type="text" id="shortcode-form" value="[wp_ctrw_form]" readonly>
+                <button type="button" class="copy-button" data-clipboard-text="[wp_ctrw_form]">Copy</button>
             </div>
             <div class="shortcode-section">
-                <label for="shortcode">Reviews Summary:</label>
-                <input type="text" id="shortcode" value="[wp_ctrw_summary]" readonly>
-                <button type="button" class="copy-button" onclick="navigator.clipboard.writeText('[wp_ctrw_summary]')">Copy</button>
+                <label for="shortcode-summary">Reviews Summary:</label>
+                <input type="text" id="shortcode-summary" value="[wp_ctrw_summary]" readonly>
+                <button type="button" class="copy-button" data-clipboard-text="[wp_ctrw_summary]">Copy</button>
             </div>
             <div class="shortcode-section">
-                <label for="shortcode">Reviews List Widget:</label>
-                <input type="text" id="shortcode" value="[wp_ctrw_lists]" readonly>
-                <button type="button" class="copy-button" onclick="navigator.clipboard.writeText('[wp_ctrw_lists]')">Copy</button>
+                <label for="shortcode-list">Reviews List:</label>
+                <input type="text" id="shortcode-list" value="[wp_ctrw_lists]" readonly>
+                <button type="button" class="copy-button" data-clipboard-text="[wp_ctrw_lists]">Copy</button>
             </div>
             <div class="shortcode-section">
-                <label for="shortcode">Reviews Slider Widget:</label>
-                <input type="text" id="shortcode" value="[wp_ctrw_slider]" readonly>
-                <button type="button" class="copy-button" onclick="navigator.clipboard.writeText('[wp_ctrw_slider]')">Copy</button>
+                <label for="shortcode-slider">Reviews Slider:</label>
+                <input type="text" id="shortcode-slider" value="[wp_ctrw_slider]" readonly>
+                <button type="button" class="copy-button" data-clipboard-text="[wp_ctrw_slider]">Copy</button>
             </div>
-                        <div class="shortcode-section">
-                <label for="shortcode">Reviews Floating Widget:</label>
-                <input type="text" id="shortcode" value="[wp_ctrw_widget]" readonly>
-                <button type="button" class="copy-button" onclick="navigator.clipboard.writeText('[wp_ctrw_widget]')">Copy</button>
+            <div class="shortcode-section">
+                <label for="shortcode-widget">Reviews Floating Widget:</label>
+                <input type="text" id="shortcode-widget" value="[wp_ctrw_widget]" readonly>
+                <button type="button" class="copy-button" data-clipboard-text="[wp_ctrw_widget]">Copy</button>
             </div>
         </div>
 
@@ -278,9 +260,9 @@
             <table class="form-table">
             <tbody>
                 <tr>
-                    <th scope="row"><label for="business_name">Enabled Schema markup</label></th>
+                    <th scope="row"><label for="enabled_schema">Enabled Schema markup</label></th>
                     <td>
-                        <input type="checkbox" name="enabled_schema" <?php checked(isset($schemaSettings['enabled_schema']) ? $schemaSettings['enabled_schema'] : '', '1'); ?>>
+                        <input type="checkbox" name="enabled_schema" id="enabled_schema" value="1" <?php checked(isset($schemaSettings['enabled_schema']) ? $schemaSettings['enabled_schema'] : '', '1'); ?>>
                     </td>
                 </tr>
                 <tr>
@@ -310,24 +292,13 @@
                             <div class="image-upload-wrapper">
                                 <div class="image-preview-wrapper">
                                     <?php 
-                                    $fallback_image = '';
-                                    if (!empty($schemaSettings['custom_image_url'])) {
-                                        $image_url = esc_url($schemaSettings['custom_image_url']);
-                                    } else {
-                                        $site_icon_id = get_option('site_icon');
-                                        if ($site_icon_id) {
-                                            $image_url = esc_url(wp_get_attachment_image_url($site_icon_id, 'thumbnail'));
-                                            $fallback_image = $image_url;
-                                        } else {
-                                            $image_url = '';
-                                        }
-                                    }
+                                    $image_url = !empty($schemaSettings['custom_image_url']) ? esc_url($schemaSettings['custom_image_url']) : '';
                                     ?>
                                     <img id="image-preview" src="<?php echo $image_url; ?>" height="100" <?php echo empty($image_url) ? 'style="display: none;"' : ''; ?>>
                                 </div>
                                 <input id="upload_image_button" type="button" class="button" value="Upload Image" />
-                                <input type="hidden" name="custom_image_url" id="custom_image_url" value="<?php echo isset($schemaSettings['custom_image_url']) ? esc_attr($schemaSettings['custom_image_url']) : esc_attr($fallback_image); ?>">
-                                <p class="description">Upload an image or it will use the site icon by default</p>
+                                <input type="hidden" name="custom_image_url" id="custom_image_url" value="<?php echo esc_attr($image_url); ?>">
+                                <p class="description">Upload an image or it will use the site icon by default.</p>
                             </div>
                     </td>
                 </tr>
@@ -365,34 +336,30 @@
         <div class="form-group tab-section" id="tab-advanced" style="display:none">
             <h3><?php esc_html_e('Advanced Settings', 'wp_cr'); ?></h3>
             <label for="replace_woocommerce_reviews">
-                            <input type="checkbox" name="replace_woocommerce_reviews" id="replace_woocommerce_reviews" value="1"
-                            <?= checked(1, get_option('customer_reviews_settings')['replace_woocommerce_reviews'] ?? 0, false) ?>>
-                            <?php esc_html_e('Replace WooCommerce Default Review System', 'wp_cr'); ?>
-                        </label>
-
+                <input type="checkbox" name="replace_woocommerce_reviews" id="replace_woocommerce_reviews" value="1"
+                <?= checked(1, get_option('customer_reviews_settings')['replace_woocommerce_reviews'] ?? 0, false) ?>>
+                <?php esc_html_e('Replace WooCommerce Default Review System', 'wp_cr'); ?>
+            </label>
 
             <label for="review_display_type"><?php esc_html_e('WooCommerce Reviews Display Style:', 'wp_cr'); ?></label>
-                        <select name="review_display_type" id="review_display_type">
-                            <option value="list" <?= selected(get_option('customer_reviews_settings')['review_display_type'] ?? 'list', 'list', false) ?>><?php esc_html_e('List', 'wp_cr'); ?></option>
-                            <option value="slider" <?= selected(get_option('customer_reviews_settings')['review_display_type'] ?? '', 'slider', false) ?>><?php esc_html_e('Slider', 'wp_cr'); ?></option>
-                            <option value="floating" <?= selected(get_option('customer_reviews_settings')['review_display_type'] ?? '', 'floating', false) ?>><?php esc_html_e('Floating Widget', 'wp_cr'); ?></option>
-
-                        </select><br> <p id="review_display_info"></p>
+            <select name="review_display_type" id="review_display_type">
+                <option value="list" <?= selected(get_option('customer_reviews_settings')['review_display_type'] ?? 'list', 'list', false) ?>><?php esc_html_e('List', 'wp_cr'); ?></option>
+                <option value="slider" <?= selected(get_option('customer_reviews_settings')['review_display_type'] ?? '', 'slider', false) ?>><?php esc_html_e('Slider', 'wp_cr'); ?></option>
+                <option value="floating" <?= selected(get_option('customer_reviews_settings')['review_display_type'] ?? '', 'floating', false) ?>><?php esc_html_e('Floating Widget', 'wp_cr'); ?></option>
+            </select><br> <p id="review_display_info"></p>
 
             <div style="margin-top: 18px;">
                 <label for="notification_admin_emails">
                     <?php esc_html_e('Notification Admin Emails', 'wp_cr'); ?>
                     <span class="ctrw-tooltip">
                         <span class="dashicons dashicons-editor-help"></span>
-                        <span class="tooltiptext tooltip-right-msg">If more than one email, separate with a comma</span>
+                        <span class="tooltiptext tooltip-right-msg">If more than one email, separate with a comma.</span>
                     </span>
                 </label>
                 <?php
                     $settings = get_option('customer_reviews_settings');
                     $admin_email = get_option('admin_email');
-                    $emails = isset($settings['notification_admin_emails']) && trim($settings['notification_admin_emails']) !== ''
-                        ? $settings['notification_admin_emails']
-                        : $admin_email;
+                    $emails = !empty($settings['notification_admin_emails']) ? $settings['notification_admin_emails'] : $admin_email;
                 ?>
                 <input type="text" name="notification_admin_emails" id="notification_admin_emails"
                     value="<?= esc_attr($emails); ?>"
@@ -401,24 +368,9 @@
             </div>
 
         </div>
-
-
-
-        
         
         <p class="submit">
             <button type="submit" class="button-primary">Save Settings</button>
         </p>    
     </form>
 </div>
-
-<script>
-function showTab(e, tabId) {
-    e.preventDefault();
-    document.querySelectorAll('.tab-section').forEach(tab => tab.style.display = 'none');
-    document.querySelectorAll('.nav-tab').forEach(tab => tab.classList.remove('nav-tab-active'));
-    document.getElementById('tab-' + tabId).style.display = 'block';
-    e.currentTarget.classList.add('nav-tab-active');
-}
-
-</script>

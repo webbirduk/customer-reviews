@@ -203,7 +203,7 @@ span.tooltiptext.tooltip-right-msg {
     font-size: 1.2em;
     vertical-align: middle;
     line-height: unset;
-    margin-top: 0px;
+    margin-top: -8px;
  }
 .ctrw-tooltip .dashicons-editor-help:before {
      color: #72777c;
