@@ -153,7 +153,6 @@ $review_count = count($reviews);
    }
 
    .ctrw-slider-rating {
-       color: #FFC107;
        font-size: 18px;
    }
   

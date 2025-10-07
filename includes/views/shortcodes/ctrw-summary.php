@@ -121,9 +121,7 @@ if ($total_reviews > 0) {
     letter-spacing: 2px;
 }
 
-.star-filled {
-    color: #ffb300;
-}
+
 
 .star-half {
     position: relative;
@@ -136,7 +134,6 @@ if ($total_reviews > 0) {
     left: 0;
     width: 50%;
     overflow: hidden;
-    color: #ffb300;
 }
 
 .star-empty {
@@ -164,7 +161,7 @@ if ($total_reviews > 0) {
 
 .star-label {
     font-size: 0.9rem;
-    color: #ffb300;
+
     flex-shrink: 0;
     letter-spacing: 1px;
 }

@@ -69,10 +69,7 @@ margin: 0px 10px 10px 00px;
     transition: color 0.2s ease-in-out;
 }
 
-#reviews-container .star.filled {
-    color: gold;
-    /* Yellow for selected stars */
-}
+
 
 #reviews-container .star.empty {
     color: lightgray;

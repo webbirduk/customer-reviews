@@ -49,6 +49,7 @@ class Review_Controller {
         add_action('wp_ajax_nopriv_ctrw_import_review_from_others', [$this, 'ctrw_import_reviews']);
         add_action('wp_ajax_load_reviews_ajax', [$this, 'load_reviews_ajax_handler']);
         add_action('wp_ajax_nopriv_load_reviews_ajax', [$this, 'load_reviews_ajax_handler']);
+        add_action('wp_ajax_get_review_details', [$this, 'get_review_details_ajax']);
 
         // Shortcodes and other hooks
         add_shortcode('wp_ctrw_form', [$this,'customer_reviews_form_shortcode']);
@@ -330,7 +331,50 @@ class Review_Controller {
         
         $settings = get_option('customer_reviews_settings');
         $star_color = !empty($settings['star_color']) ? sanitize_hex_color($settings['star_color']) : '#fbbc04';
-        $custom_css = ".rating label:hover, .rating label:hover ~ label, .rating input:checked ~ label { color: {$star_color} !important; } .star.filled { color: {$star_color}; }";
+        
+        // Comprehensive inline CSS for dynamic star color
+        $custom_css = "
+            /* Review Form */
+            .rating label:hover,
+            .rating label:hover ~ label,
+            .rating input:checked ~ label {
+                color: {$star_color} !important;
+            }
+
+            /* Review List & WooCommerce Summary */
+            .star.filled, .ctrw-stars {
+                color: {$star_color};
+            }
+
+            /* Review Summary Widget */
+            .star-display .star-filled,
+            .star-display .star-half:after,
+            .rating-bar-row .star-label {
+                color: {$star_color};
+            }
+            .bar-foreground {
+                background-color: {$star_color};
+            }
+
+            /* Floating Widget */
+            .ctrw-floating-widget {
+                --ctrw-primary: {$star_color};
+            }
+            .ctrw-review-rating, .ctrw-title-icon {
+                 color: {$star_color};
+            }
+             .ctrw-admin-reply .ctrw-reply-header svg path {
+                stroke: {$star_color};
+            }
+
+
+            /* Slider */
+            .ctrw-slider-rating .filled,
+             .ctrw-header-rating {
+                color: {$star_color};
+            }
+        ";
+        
         wp_add_inline_style('ctrw-review-form', $custom_css);
     }
     
@@ -511,6 +555,29 @@ class Review_Controller {
         
         echo $content;
         wp_die();
+    }
+
+    /**
+     * AJAX handler to fetch details for a single review.
+     */
+    public function get_review_details_ajax() {
+        check_ajax_referer('ctrw_nonce', 'security');
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error(['message' => 'Permission denied.']);
+        }
+
+        $review_id = isset($_POST['review_id']) ? intval($_POST['review_id']) : 0;
+        if (!$review_id) {
+            wp_send_json_error(['message' => 'Invalid review ID.']);
+        }
+
+        $review = $this->model->get_review_by_id($review_id);
+
+        if ($review) {
+            wp_send_json_success($review);
+        } else {
+            wp_send_json_error(['message' => 'Review not found.']);
+        }
     }
 
     /**

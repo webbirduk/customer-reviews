@@ -104,22 +104,10 @@
                         <td>
                             <?php if ($review['status'] !== 'rejected'): ?>
                                 <button type="button" class="button reply-now"
-                                    data-review-id="<?= intval($review['id']) ?>"
-                                    data-review-author="<?= esc_attr($review['name']) ?>"
-                                    data-reply-message="<?= esc_attr($review['admin_reply']) ?>">Reply</button>
+                                    data-review-id="<?= intval($review['id']) ?>">Reply</button>
                                 <button type="button" class="button edit-review"
                                     data-review-id="<?= intval($review['id']) ?>"
-                                    data-review-author="<?= esc_attr($review['name']) ?>"
-                                    data-review-email="<?= esc_attr($review['email']) ?>"
-                                    data-review-phone="<?= esc_attr($review['phone']) ?>"
-                                    data-review-website="<?= esc_attr($review['website']) ?>"
-                                    data-review-title="<?= esc_attr($review['title']) ?>"
-                                    data-review-comment="<?= esc_attr($review['comment']) ?>"
-                                    data-review-rating="<?= intval($review['rating']) ?>"
-                                    data-review-status="<?= esc_attr($review['status']) ?>"
-                                    data-review-city="<?= esc_attr($review['city']) ?>"
-                                    data-review-state="<?= esc_attr($review['state']) ?>"
-                                    data-review-positionid="<?= intval($review['positionid']) ?>" data-update-type="update">
+                                    data-update-type="update">
                                     Edit Review
                                 </button>
                             <?php else: ?>

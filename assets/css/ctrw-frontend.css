@@ -436,3 +436,7 @@ line-height: 36pt;
         .ctrw_control-btn.ctrw_active {
             background: #555;
         }
+
+        .ctrw-slider-rating span.empty {
+    color: lightgray;
+}
