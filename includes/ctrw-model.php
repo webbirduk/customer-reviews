@@ -1,265 +1,304 @@
 <?php
 if (!defined('ABSPATH')) {
-    exit;
+    exit; // Exit if accessed directly.
 }
 
+/**
+ * CTRW_Model Class
+ *
+ * Handles all database interactions for the Customer Reviews plugin.
+ * It is responsible for querying, inserting, updating, and deleting review data.
+ */
 class CTRW_Model {
 
-    private $wpdb;
-    private $table;
+    private wpdb $wpdb;
+    private string $table;
 
+    /**
+     * Constructor.
+     */
     public function __construct() {
         global $wpdb;
-        $this->wpdb = $wpdb;
-        $this->table = $wpdb->prefix . 'customer_reviews';
+        $this->wpdb  = $wpdb;
+        $this->table = $this->wpdb->prefix . 'customer_reviews';
     }
-    public function get_reviews_by_status($status) {
-        if ($status === 'all') {
-            return $this->wpdb->get_results("SELECT * FROM $this->table");
-        } else {
-            return $this->wpdb->get_results($this->wpdb->prepare("SELECT * FROM $this->table WHERE status = %s", $status));
+
+    /**
+     * Retrieves reviews from the database based on their status.
+     *
+     * @param string $status The review status to filter by (e.g., 'approved', 'pending'). Use 'all' to get all reviews.
+     * @return array An array of review objects.
+     */
+    public function get_reviews_by_status(string $status): array {
+        if ('all' === $status) {
+            return $this->wpdb->get_results("SELECT * FROM {$this->table} ORDER BY created_at DESC");
         }
-    }
-
-    public function get_review_counts() {
-
-        $counts = [
-            'all'      => 0,
-            'Approved' => 0,
-            'Rejected'   => 0,
-            'Pending'  => 0,
-            'Trash'    => 0,
-        ];
-
-        $query = "SELECT status, COUNT(*) as count FROM $this->table GROUP BY status";
-        $results = $this->wpdb->get_results($query);
-
-        foreach ($results as $row) {
-            $counts[$row->status] = $row->count;
-        }
-
-        $counts['all'] = array_sum($counts);
-
-        return $counts;
-    }
-
-    function get_average_rating() {
-        global $wpdb;
-        
-        // Base query
-        $query = "SELECT AVG(rating) as average_rating FROM $this->table WHERE status = 'approved'";
-        $result = $wpdb->get_var($query);
-        
-        return $result ? round($result, 1) : 0;
-    }
-
-    public function update_review_status($review_ids, $status) {
-
-        $this->wpdb->query(
+        return $this->wpdb->get_results(
             $this->wpdb->prepare(
-                "UPDATE $this->table SET status = %s WHERE id IN (" . implode(',', array_map('intval', $review_ids)) . ")",
+                "SELECT * FROM {$this->table} WHERE status = %s ORDER BY created_at DESC",
                 $status
             )
         );
     }
 
     /**
-     * Import reviews from the Site Reviews plugin.
+     * Gets the count of reviews for each status.
      *
-     * This function retrieves reviews from the Site Reviews plugin's database tables
-     * and imports them into the custom reviews table.
-     *
-     * @return int The number of reviews imported.
+     * @return array An associative array with status keys and count values.
      */
+    public function get_review_counts(): array {
+        $counts = [
+            'All'      => 0,
+            'Approved' => 0,
+            'Rejected' => 0,
+            'Pending'  => 0,
+            'Trash'    => 0,
+        ];
 
-    public function import_reviews_from_site_reviews_plugin() {
-
-        global $wpdb;
-        // Get all 'site-review' posts from wp_posts
-        $site_reviews = $wpdb->get_results(
-            "SELECT ID, post_date, post_content, post_title
-             FROM {$wpdb->posts} 
-             WHERE post_type = 'site-review'"
+        $results = $this->wpdb->get_results(
+            "SELECT status, COUNT(*) as count FROM {$this->table} GROUP BY status",
+            ARRAY_A
         );
 
-        $imported = 0;
-        $data = [];
-        if ($site_reviews) {
-            foreach ($site_reviews as $review) {
-                // Fetch name, rating, and email from wp_glsr_ratings for this review
-                $glsr_rating = $wpdb->get_row(
-                    $wpdb->prepare(
-                        "SELECT name, rating, email FROM {$wpdb->prefix}glsr_ratings WHERE review_id = %d LIMIT 1",
-                        $review->ID
-                    ),
-                    ARRAY_A
-                );
-
-
-
-                // Merge fetched data into $data
-                if ($glsr_rating) {
-                    $data['name'] = $glsr_rating['name'];
-                    $data['rating'] = $glsr_rating['rating'];
-                    $data['email'] = $glsr_rating['email'];
-                } else {
-                    $data['name'] = '';
-                    $data['rating'] = 0;
-                    $data['email'] = '';
+        $total = 0;
+        if ($results) {
+            foreach ($results as $row) {
+                if (array_key_exists($row['status'], $counts)) {
+                    $counts[$row['status']] = (int) $row['count'];
+                    $total += (int) $row['count'];
                 }
+            }
+        }
+        $counts['All'] = $total;
+        return $counts;
+    }
 
-                 $review_data = [
-                    
-                    'name' => $data['name'],
-                    'email' => $data['email'],
-                    'phone' => '',
-                    'website' => '',
-                    'city' => '',
-                    'state' => '',
-                    'rating' => $data['rating'],
-                    'title' => $review->post_title,
-                    'comment' => $review->post_content,
-                    'status' => 'approved',
-                    'positionid' => '',
-                    'created_at' => $review->post_date
-                ];
-                $imported++;
-                $this->ctrw_add_review($review_data);
-                
+    /**
+     * Calculates the average rating for all approved reviews.
+     *
+     * @return float The average rating, rounded to one decimal place.
+     */
+    public function get_average_rating(): float {
+        $result = $this->wpdb->get_var(
+            "SELECT AVG(rating) FROM {$this->table} WHERE status = 'approved'"
+        );
+        return $result ? round((float) $result, 1) : 0.0;
+    }
+
+    /**
+     * Updates the status of one or more reviews.
+     *
+     * @param array $review_ids An array of review IDs to update.
+     * @param string $status The new status to set.
+     * @return int|false The number of rows updated, or false on error.
+     */
+    public function update_review_status(array $review_ids, string $status) {
+        if (empty($review_ids)) {
+            return false;
+        }
+        $ids_placeholder = implode(', ', array_fill(0, count($review_ids), '%d'));
+        
+        return $this->wpdb->query(
+            $this->wpdb->prepare(
+                "UPDATE {$this->table} SET status = %s WHERE id IN ({$ids_placeholder})",
+                array_merge([$status], $review_ids)
+            )
+        );
+    }
+
+    /**
+     * Imports reviews from the "Site Reviews" plugin.
+     *
+     * @return int The number of reviews successfully imported.
+     */
+    public function import_reviews_from_site_reviews_plugin(): int {
+        $site_reviews = $this->wpdb->get_results(
+            "SELECT ID, post_date, post_content, post_title
+             FROM {$this->wpdb->posts} 
+             WHERE post_type = 'site-review' AND post_status = 'publish'"
+        );
+
+        $imported_count = 0;
+        if (empty($site_reviews)) {
+            return 0;
+        }
+
+        foreach ($site_reviews as $review) {
+            $glsr_rating = $this->wpdb->get_row(
+                $this->wpdb->prepare(
+                    "SELECT name, rating, email FROM {$this->wpdb->prefix}glsr_ratings WHERE review_id = %d LIMIT 1",
+                    $review->ID
+                ),
+                ARRAY_A
+            );
+
+            $review_data = [
+                'name'       => $glsr_rating['name'] ?? 'Anonymous',
+                'email'      => $glsr_rating['email'] ?? '',
+                'rating'     => $glsr_rating['rating'] ?? 0,
+                'title'      => $review->post_title,
+                'comment'    => $review->post_content,
+                'status'     => 'approved',
+                'created_at' => $review->post_date
+            ];
+            
+            if ($this->ctrw_add_review($review_data)) {
+                $imported_count++;
             }
         }
         
-        return $imported;
+        return $imported_count;
     }
 
-    public function import_reviews_from_wp_customer_reviews() {
-        global $wpdb;
-
-        // Get all review post IDs from wp_postmeta where meta_key = 'wpcr3_review_post'
-        $review_post_ids = $wpdb->get_col(
-            "SELECT DISTINCT post_id FROM {$wpdb->postmeta} WHERE meta_key = 'wpcr3_review_post'"
+    /**
+     * Imports reviews from the "WP Customer Reviews" plugin.
+     *
+     * @return int The number of reviews successfully imported.
+     */
+    public function import_reviews_from_wp_customer_reviews(): int {
+        $review_posts = $this->wpdb->get_results(
+            "SELECT p.ID, p.post_date, p.post_content 
+            FROM {$this->wpdb->posts} p
+            JOIN {$this->wpdb->postmeta} pm ON p.ID = pm.post_id
+            WHERE pm.meta_key = 'wpcr3_review' AND pm.meta_value = '1'"
         );
 
+        $imported_count = 0;
+        if (empty($review_posts)) {
+            return 0;
+        }
+
+        foreach ($review_posts as $post) {
+            $meta = get_post_meta($post->ID);
+            
+            $review_data = [
+                'name'       => $meta['wpcr3_review_name'][0] ?? 'Anonymous',
+                'email'      => $meta['wpcr3_review_email'][0] ?? '',
+                'website'    => $meta['wpcr3_review_website'][0] ?? '',
+                'title'      => $meta['wpcr3_review_title'][0] ?? '',
+                'rating'     => $meta['wpcr3_review_rating'][0] ?? 0,
+                'positionid' => $meta['wpcr3_review_post'][0] ?? 0,
+                'comment'    => $post->post_content,
+                'status'     => 'approved',
+                'created_at' => $post->post_date
+            ];
+
+            if ($this->ctrw_add_review($review_data)) {
+                $imported_count++;
+            }
+        }
+
+        return $imported_count;
+    }
+
+    /**
+     * Deletes one or more reviews permanently.
+     *
+     * @param array $review_ids An array of review IDs to delete.
+     * @return int|false The number of rows deleted, or false on error.
+     */
+    public function delete_reviews(array $review_ids) {
+        if (empty($review_ids)) {
+            return false;
+        }
+        $ids_placeholder = implode(', ', array_fill(0, count($review_ids), '%d'));
         
-
-          $imported = 0;
-          $data = [];
-        if ($review_post_ids) {
-            foreach ($review_post_ids as $post_id) {
-              
-            // Get all relevant meta values for this review
-            $postID    = $wpdb->get_var($wpdb->prepare(
-                "SELECT meta_value FROM {$wpdb->postmeta} WHERE post_id = %d AND meta_key = 'wpcr3_review_post' LIMIT 1",
-                $post_id
-            ));
-            $name    = $wpdb->get_var($wpdb->prepare(
-                "SELECT meta_value FROM {$wpdb->postmeta} WHERE post_id = %d AND meta_key = 'wpcr3_review_name' LIMIT 1",
-                $post_id
-            ));
-            $email   = $wpdb->get_var($wpdb->prepare(
-                "SELECT meta_value FROM {$wpdb->postmeta} WHERE post_id = %d AND meta_key = 'wpcr3_review_email' LIMIT 1",
-                $post_id
-            ));
-            $rating  = $wpdb->get_var($wpdb->prepare(
-                "SELECT meta_value FROM {$wpdb->postmeta} WHERE post_id = %d AND meta_key = 'wpcr3_review_rating' LIMIT 1",
-                $post_id
-            ));
-            $title   = $wpdb->get_var($wpdb->prepare(
-                "SELECT meta_value FROM {$wpdb->postmeta} WHERE post_id = %d AND meta_key = 'wpcr3_review_title' LIMIT 1",
-                $post_id
-            ));
-            $website = $wpdb->get_var($wpdb->prepare(
-                "SELECT meta_value FROM {$wpdb->postmeta} WHERE post_id = %d AND meta_key = 'wpcr3_review_website' LIMIT 1",
-                $post_id
-            ));
-
-
-       
-
-        // Get post_date and post_content from wp_posts for this review
-        $post_data = $wpdb->get_row(
-            $wpdb->prepare(
-                "SELECT post_date, post_content FROM {$wpdb->posts} WHERE ID = %d LIMIT 1",
-                $post_id
+        return $this->wpdb->query(
+            $this->wpdb->prepare(
+                "DELETE FROM {$this->table} WHERE id IN ({$ids_placeholder})",
+                $review_ids
             )
         );
-
-        
-
-              
-
-            
-                $data = [
-                    'name' => $name,
-                    'email' => $email,
-                    'phone' => '',
-                    'website' => $website,
-                    'city' => '',
-                    'state' => '',
-                    'title' => $title, 
-                    'comment' => $post_data->post_content,
-                    'rating' => $rating,
-                    'status' => 'approved',
-                    'positionid' => $postID,
-                    'created_at' => $post_data->post_date
-                ];
-
-               
-
-                $this->ctrw_add_review($data);
-                    $imported++;
-                
-            
-        }
     }
 
-        return $imported;
-    }
-
-    public function delete_reviews($review_ids) {
-        $this->wpdb->query(
-            "DELETE FROM $this->table WHERE id IN (" . implode(',', array_map('intval', $review_ids)) . ")"
-        );
-    }
-
-    public function ctrw_add_review($data) {
+    /**
+     * Adds a new review to the database.
+     *
+     * @param array $data An associative array of review data.
+     * @return int|false The number of rows inserted (1), or false on error.
+     */
+    public function ctrw_add_review(array $data) {
         return $this->wpdb->insert($this->table, $data);
     }
 
-    public function get_reviews($status = 'approved'){
-        return $this->wpdb->get_results("SELECT * FROM {$this->table} WHERE status = '$status' ORDER BY created_at DESC");
-    }
-    public function get_review_by_id($id) {
-        return $this->wpdb->get_row($this->wpdb->prepare("SELECT * FROM {$this->table} WHERE id = %d", $id));
-    }
-    public function get_review_count_by_positionid($positionid) {
-        $count = $this->wpdb->get_var(
-            $this->wpdb->prepare("SELECT COUNT(*) FROM $this->table WHERE positionid = %d", $positionid)
-        );
-        return (int) $count;
-    }
-    public function get_average_rating_by_positionid($positionid) {
-        $avg = $this->wpdb->get_var(
+    /**
+     * Retrieves all reviews of a given status, ordered by creation date.
+     *
+     * @param string $status The status of reviews to fetch (defaults to 'approved').
+     * @return array An array of review objects.
+     */
+    public function get_reviews(string $status = 'approved'): array {
+        return $this->wpdb->get_results(
             $this->wpdb->prepare(
-                "SELECT AVG(rating) FROM $this->table WHERE positionid = %d AND status = %s",
-                $positionid,
-                'approved'
+                "SELECT * FROM {$this->table} WHERE status = %s ORDER BY created_at DESC",
+                $status
             )
         );
-        return $avg !== null ? round((float)$avg, 2) : 0;
     }
 
-
-    public function update_review($id, $data) {
-     
-      return $this->wpdb->update($this->table, $data, ['id' => $id]);
-    }
-
-    public function get_review_count_by_status($status) {
-        $count = $this->wpdb->get_var(
-            $this->wpdb->prepare("SELECT COUNT(*) FROM $this->table WHERE status = %s", $status)
+    /**
+     * Retrieves a single review by its ID.
+     *
+     * @param int $id The ID of the review.
+     * @return object|null The review object, or null if not found.
+     */
+    public function get_review_by_id(int $id): ?object {
+        return $this->wpdb->get_row(
+            $this->wpdb->prepare("SELECT * FROM {$this->table} WHERE id = %d", $id)
         );
-        return (int) $count;
+    }
+
+    /**
+     * Gets the total count of approved reviews for a specific post ID.
+     *
+     * @param int $positionid The post ID (positionid).
+     * @return int The number of reviews.
+     */
+    public function get_review_count_by_positionid(int $positionid): int {
+        return (int) $this->wpdb->get_var(
+            $this->wpdb->prepare(
+                "SELECT COUNT(*) FROM {$this->table} WHERE positionid = %d AND status = 'approved'",
+                $positionid
+            )
+        );
+    }
+
+    /**
+     * Calculates the average rating for a specific post ID.
+     *
+     * @param int $positionid The post ID (positionid).
+     * @return float The average rating.
+     */
+    public function get_average_rating_by_positionid(int $positionid): float {
+        $avg = $this->wpdb->get_var(
+            $this->wpdb->prepare(
+                "SELECT AVG(rating) FROM {$this->table} WHERE positionid = %d AND status = 'approved'",
+                $positionid
+            )
+        );
+        return $avg !== null ? round((float)$avg, 2) : 0.0;
+    }
+
+    /**
+     * Updates an existing review in the database.
+     *
+     * @param int $id The ID of the review to update.
+     * @param array $data An associative array of data to update.
+     * @return int|false The number of rows updated, or false on error.
+     */
+    public function update_review(int $id, array $data) {
+        return $this->wpdb->update($this->table, $data, ['id' => $id]);
+    }
+
+    /**
+     * Gets the total count of reviews for a specific status.
+     *
+     * @param string $status The status to count reviews for.
+     * @return int The number of reviews with the given status.
+     */
+    public function get_review_count_by_status(string $status): int {
+        return (int) $this->wpdb->get_var(
+            $this->wpdb->prepare("SELECT COUNT(*) FROM {$this->table} WHERE status = %s", $status)
+        );
     }
 }
-?>

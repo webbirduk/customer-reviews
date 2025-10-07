@@ -19,7 +19,7 @@ jQuery(document).ready(function($) {
             data: {
                 action: 'get_review_details',
                 review_id: reviewId,
-                security: ctrw_admin_ajax.nonce
+                nonce: ctrw_admin_ajax.nonce
             },
             success: function(response) {
                 if (response.success) {
@@ -63,7 +63,7 @@ jQuery(document).ready(function($) {
                 action: 'save_review_reply',
                 review_id: reviewId,
                 reply_message: replyMessage,
-                security: ctrw_admin_ajax.nonce 
+                nonce: ctrw_admin_ajax.nonce 
             },
             success: function(response) {
                 if (response.success) {
@@ -108,7 +108,7 @@ jQuery(document).ready(function($) {
                 data: {
                     action: 'get_review_details',
                     review_id: reviewId,
-                    security: ctrw_admin_ajax.nonce
+                    nonce: ctrw_admin_ajax.nonce
                 },
                 success: function(response) {
                     if (response.success) {
@@ -166,7 +166,7 @@ jQuery(document).ready(function($) {
                 rating: $('#edit-review-rating').val(),
                 title: $('#edit-review-title').val(),
                 positionid: $('#edit-review-positionid').val(),
-                security: ctrw_admin_ajax.nonce
+                nonce: ctrw_admin_ajax.nonce
             },
             success: function(response) {
                 if (response.success) {
@@ -201,7 +201,7 @@ jQuery(document).ready(function($) {
             data: {
                 action: 'ctrw_import_review_from_others',
                 ctrw_import_review: selectedPlugin,
-                security: ctrw_admin_ajax.nonce
+                nonce: ctrw_admin_ajax.nonce
             },
             success: function(response) {
                 if (response.success) {
@@ -242,7 +242,7 @@ jQuery(document).ready(function($) {
     $('#ctrw-form-settings').on('submit', function(e) {
         e.preventDefault();
         var formData = $(this).serialize();
-        formData += '&security=' + ctrw_admin_ajax.nonce;
+        formData += '&nonce=' + ctrw_admin_ajax.nonce;
         formData += '&action=ctrw_save_settings';            
         $.ajax({
             type: 'POST',

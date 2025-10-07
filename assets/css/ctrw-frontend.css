@@ -1,3 +1,10 @@
+/* === GENERAL VARIABLES === */
+:root {
+      /* The star color is defined inline by the controller, with a fallback here */
+      --ctrw-star-color: #fbbc04;
+}
+
+
 /* === CTRW FORM STYLES === */
 .customer-reviews-form-container {
       padding: 0px;
@@ -16,8 +23,8 @@
 }
 
 .ctrw-form-heading {
-font-size: 18pt;
-line-height: 36pt;
+    font-size: 18pt;
+    line-height: 36pt;
 }
 
 #customer-reviews-form .form-group {
@@ -34,14 +41,9 @@ line-height: 36pt;
 .customer-reviews-form-container .form-group textarea {
       width: 100%;
       border: 1px solid #d1d1d1;
-      border: 1px solid #ddd;
       border-radius: 4px;
       box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.07);
       padding: 4px 10px;
-      padding-top: 4px;
-      padding-right: 10px;
-      padding-bottom: 4px;
-      padding-left: 10px;
       line-height: 2;
       height: 40px;
 }
@@ -56,7 +58,6 @@ line-height: 36pt;
       justify-content: start;
       font-size: 24px;
       color: #ccc;
-      /* Default star color */
       margin-top: -10px;
 }
 
@@ -70,13 +71,18 @@ line-height: 36pt;
       font-size: 32px;
 }
 
+#customer-reviews-form .rating input:checked ~ label,
+#customer-reviews-form .rating label:hover,
+#customer-reviews-form .rating label:hover ~ label {
+    color: var(--ctrw-star-color);
+}
+
 #customer-reviews-form .review-author {
       font-size: 16px;
       font-weight: bold;
 }
 
 /* === CTRW REVIEWS LIST STYLES === */
-/* Source: ctrw-reviews-list.css */
 #reviews-container .review-item {
     padding: 15px 28px 10px 28px;
     margin-bottom: 10px;
@@ -103,11 +109,7 @@ line-height: 36pt;
 }
 
 #reviews-container .review-content p {
-    margin: 0px 10px 10px 00px;
-    margin-top: 0px;
-    margin-right: 10px;
-    margin-bottom: 10px;
-    margin-left: 0px;
+    margin: 0px 10px 10px 0px;
 }
 
 #reviews-container .review-date {
@@ -141,9 +143,12 @@ line-height: 36pt;
     transition: color 0.2s ease-in-out;
 }
 
+#reviews-container .star.filled {
+    color: var(--ctrw-star-color);
+}
+
 #reviews-container .star.empty {
     color: lightgray;
-    /* Gray for unselected stars */
 }
 
 #reviews-container .review-author {
@@ -192,8 +197,7 @@ line-height: 36pt;
     bottom: 0px;
     z-index: 9999;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-    --ctrw-primary: #FFB800;
-    --ctrw-primary-hover: #E6A600;
+    --ctrw-primary: var(--ctrw-star-color);
     --ctrw-text: #333333;
     --ctrw-text-light: #666666;
     --ctrw-text-lighter: #999999;
@@ -214,7 +218,7 @@ line-height: 36pt;
 }
 
 .ctrw-floating-tab:hover {
-    background: var(--ctrw-primary-hover);
+    filter: brightness(0.9);
 }
 
 .ctrw-tab-content {
@@ -408,6 +412,10 @@ line-height: 36pt;
     margin-right: 6px;
 }
 
+.ctrw-reply-header svg path {
+    stroke: var(--ctrw-primary);
+}
+
 .ctrw-reply-content {
     font-size: 13px;
     color: var(--ctrw-text-light);
@@ -435,7 +443,7 @@ line-height: 36pt;
 }
 
 .ctrw-view-all-btn:hover {
-    background: var(--ctrw-primary-hover);
+    filter: brightness(0.9);
     transform: translateY(-1px);
 }
 
@@ -518,7 +526,7 @@ line-height: 36pt;
 }
 
 .ctrw-slider-header .ctrw-header-rating {
-   color: #FFC107;
+   color: var(--ctrw-star-color);
    font-size: 24px;
    margin-bottom: 10px;
 }
@@ -615,6 +623,13 @@ line-height: 36pt;
 
 .ctrw-slider-rating {
    font-size: 18px;
+}
+
+.ctrw-slider-rating .filled {
+    color: var(--ctrw-star-color);
+}
+.ctrw-slider-rating .empty {
+    color: #ccc;
 }
 
 .ctrw-verified-icon {
@@ -771,6 +786,11 @@ line-height: 36pt;
     letter-spacing: 2px;
 }
 
+.star-display .star-filled,
+.star-display .star-half:after {
+    color: var(--ctrw-star-color);
+}
+
 .star-half {
     position: relative;
     color: #e0e0e0;
@@ -811,6 +831,7 @@ line-height: 36pt;
     font-size: 0.9rem;
     flex-shrink: 0;
     letter-spacing: 1px;
+    color: var(--ctrw-star-color);
 }
 
 .bar-background {
@@ -823,7 +844,7 @@ line-height: 36pt;
 
 .bar-foreground {
     height: 100%;
-    background-color: #ffb300;
+    background-color: var(--ctrw-star-color);
     border-radius: 4px;
     transition: width 0.6s ease;
 }

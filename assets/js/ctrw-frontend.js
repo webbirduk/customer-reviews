@@ -4,21 +4,38 @@ jQuery(document).ready(function ($) {
     if ($reviewForm.length) {
         $reviewForm.on("submit", function (e) {
             e.preventDefault();
+            const $submitButton = $(this).find('#comment-submit');
+            const $message = $("#review-message");
+            
             let formData = $reviewForm.serialize();
             formData += "&action=submit_review";
+            formData += "&nonce=" + ctrw_ajax.nonce; 
+
+            // Add feedback to user
+            $submitButton.prop('disabled', true).val('Submitting...');
+            $message.html('').hide();
 
             $.ajax({
                 url: ctrw_ajax.ajax_url,
                 method: "POST",
                 data: formData,
-                success: function (data) {
-                    let $message = $("#review-message");
-                    if (data.success) {
-                        $message.html("✅ Review submitted successfully!").css("color", "green");
+                dataType: 'json', // Expect a JSON response
+                success: function (response) {
+                    if (response.success) {
+                        $message.html("✅ " + response.data.message).css("color", "green").fadeIn();
                         $reviewForm[0].reset();
                     } else {
-                        $message.html("❌ Error submitting review.").css("color", "red");
+                        // Display specific error message from server if available
+                        const errorMessage = response.data.message || 'Error submitting review.';
+                        $message.html("❌ " + errorMessage).css("color", "red").fadeIn();
                     }
+                },
+                error: function () {
+                    $message.html("❌ An unexpected error occurred. Please try again.").css("color", "red").fadeIn();
+                },
+                complete: function() {
+                    // Re-enable the button
+                    $submitButton.prop('disabled', false).val('Submit');
                 }
             });
         });
@@ -29,14 +46,14 @@ jQuery(document).ready(function ($) {
         e.preventDefault();
         e.stopPropagation();
         
-        var target = $('#reviews-container');
+        const target = $('#reviews-container');
         if (!target.length) return;
 
-        var scrollTo = target.offset().top - 20;
-        var page = $(this).data('page');
-        var postId = target.data('post-id');
+        const scrollTo = target.offset().top - 50; // Add some offset
+        const page = $(this).data('page');
+        const postId = target.data('post-id');
         
-        target.addClass('loading');
+        target.addClass('loading').css('opacity', 0.5);
         
         $.ajax({
             url: ctrw_ajax.ajax_url,
@@ -44,17 +61,24 @@ jQuery(document).ready(function ($) {
             data: {
                 action: 'load_reviews_ajax',
                 page: page,
-                post_id: postId
+                post_id: postId,
+                nonce: ctrw_ajax.nonce // Add nonce for security
             },
+            dataType: 'json', // Expect a JSON response
             success: function(response) {
-                target.html(response);
-                $('html, body').animate({scrollTop: scrollTo}, 300);
+                // The PHP now sends a JSON object with an 'html' property
+                if (response.success && response.data.html) {
+                    target.html(response.data.html);
+                    $('html, body').animate({scrollTop: scrollTo}, 300);
+                } else {
+                    console.error('AJAX Error: Invalid response from server.');
+                }
             },
             error: function(xhr, status, error) {
                 console.error('AJAX Error:', error);
             },
             complete: function() {
-                target.removeClass('loading');
+                target.removeClass('loading').css('opacity', 1);
             }
         });
     });
@@ -77,114 +101,78 @@ jQuery(document).ready(function ($) {
                 $floatingWidget.removeClass('active');
             }
         });
-        
-        $('.ctrw-view-all-btn').on('click', function() {
-            // In a real scenario, this would likely link to a reviews page.
-            // For now, we find the main reviews list on the page and scroll to it.
-            const reviewsSection = $('#reviews-container');
-            if (reviewsSection.length) {
-                 $('html, body').animate({
-                    scrollTop: reviewsSection.offset().top - 50
-                }, 500);
-            } else {
-                alert('No main reviews list found on this page.');
-            }
-        });
     }
 
     // Section: Review Slider
     const sliderContainer = document.querySelector('.ctrw-slider-container');
     if (sliderContainer) {
        const slidesContainer = sliderContainer.querySelector('.ctrw-slider-slides');
-       const slides = sliderContainer.querySelectorAll('.ctrw-slider-slide');
+       if (!slidesContainer) return; // Exit if slider is not properly structured
+       
+       const slides = slidesContainer.querySelectorAll('.ctrw-slider-slide');
        const prevButton = sliderContainer.querySelector('.ctrw-slider-prev');
        const nextButton = sliderContainer.querySelector('.ctrw-slider-next');
        const dotsContainer = sliderContainer.querySelector('.ctrw-slider-controls-dots');
-       const controlsContainer = sliderContainer.querySelector('.ctrw-slider-controls');
       
        if (slides.length === 0) return;
 
        let currentIndex = 0;
        const slideCount = slides.length;
-
-       const getVisibleSlides = () => {
-           if (window.innerWidth <= 768) return 1;
-           if (window.innerWidth <= 992) return 2;
-           return 3;
-       };
-
+       
        function updateSlider() {
-           const visibleSlides = getVisibleSlides();
-           const maxIndex = Math.max(0, slideCount - visibleSlides);
-           const pages = maxIndex + 1;
-
-           currentIndex = Math.max(0, Math.min(currentIndex, maxIndex));
-
-           const slideWidth = slides.length > 0 ? slides[0].offsetWidth : 0;
-           const gap = 20;
+           const slideWidth = slides[0].offsetWidth;
+           const gap = 20; // As defined in your CSS
            const offset = currentIndex * (slideWidth + gap);
            slidesContainer.style.transform = `translateX(-${offset}px)`;
 
+           // Update dots
            if (dotsContainer) {
-               dotsContainer.innerHTML = '';
-               if (pages > 1) {
-                   for (let i = 0; i < pages; i++) {
-                       const dot = document.createElement('button');
-                       dot.classList.add('ctrw-slider-dot');
-                       if (i === currentIndex) {
-                           dot.classList.add('ctrw-slider-active');
-                       }
-                       dot.dataset.index = i;
-                       dot.setAttribute('aria-label', `Go to slide ${i + 1}`);
-                       dot.addEventListener('click', () => {
-                           currentIndex = i;
-                           updateSlider();
-                       });
-                       dotsContainer.appendChild(dot);
-                   }
-               }
-           }
-
-           if (prevButton) prevButton.disabled = currentIndex === 0;
-           if (nextButton) nextButton.disabled = currentIndex === maxIndex;
-
-           const controlsVisible = slideCount > visibleSlides;
-           if (controlsContainer) {
-               controlsContainer.style.display = controlsVisible ? 'flex' : 'none';
-           }
-           slidesContainer.classList.toggle('center-items', !controlsVisible);
-       }
-      
-       slides.forEach(slide => {
-           const content = slide.querySelector('.ctrw-slider-content');
-           if (content.scrollHeight > content.clientHeight) {
-               const readMoreBtn = document.createElement('button');
-               readMoreBtn.textContent = 'Read more';
-               readMoreBtn.className = 'ctrw-read-more';
-               slide.appendChild(readMoreBtn);
-
-               readMoreBtn.addEventListener('click', () => {
-                   content.classList.toggle('expanded');
-                   readMoreBtn.textContent = content.classList.contains('expanded') ? 'Read less' : 'Read more';
+               const dots = dotsContainer.querySelectorAll('.ctrw-slider-dot');
+               dots.forEach((dot, index) => {
+                   dot.classList.toggle('ctrw-slider-active', index === currentIndex);
                });
            }
-       });
+
+           // Update buttons
+           if(prevButton) prevButton.disabled = currentIndex === 0;
+           if(nextButton) nextButton.disabled = currentIndex >= slideCount - 1;
+       }
+      
+       // Create dots
+       if (dotsContainer) {
+            for (let i = 0; i < slideCount; i++) {
+                const dot = document.createElement('button');
+                dot.classList.add('ctrw-slider-dot');
+                if (i === 0) dot.classList.add('ctrw-slider-active');
+                dot.dataset.index = i;
+                dot.setAttribute('aria-label', `Go to slide ${i + 1}`);
+                dot.addEventListener('click', () => {
+                    currentIndex = i;
+                    updateSlider();
+                });
+                dotsContainer.appendChild(dot);
+            }
+       }
 
        if (nextButton) {
            nextButton.addEventListener('click', () => {
-               currentIndex++;
-               updateSlider();
+               if (currentIndex < slideCount - 1) {
+                   currentIndex++;
+                   updateSlider();
+               }
            });
        }
 
        if (prevButton) {
            prevButton.addEventListener('click', () => {
-               currentIndex--;
-               updateSlider();
+               if (currentIndex > 0) {
+                   currentIndex--;
+                   updateSlider();
+               }
            });
        }
 
        window.addEventListener('resize', updateSlider);
-       updateSlider();
+       updateSlider(); // Initial call
     }
 });

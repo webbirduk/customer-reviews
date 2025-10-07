@@ -433,7 +433,7 @@ class CTRW_Controller {
     public function submit_review() {
         $data = array_map('sanitize_text_field', $_POST);
         $settings = get_option('customer_reviews_settings');
-        $status = !empty($settings['auto_approve_reviews']) ? 'approved' : 'pending';
+        $status = !empty($settings['auto_approve_reviews']) ? 'Approved' : 'Pending';
     
         $review_data = [
             'name' => $data['name'], 'email' => $data['email'], 'phone' => $data['phone'] ?? '', 'website' => $data['website'] ?? '',
