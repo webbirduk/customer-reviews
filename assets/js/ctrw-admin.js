@@ -80,50 +80,68 @@ jQuery(document).ready(function($) {
         });
     });
 
-    // Edit review popup logic
+    // Edit review popup logic (handles both ADD and EDIT)
     $('.edit-review').on('click', function() {
-        var reviewId = $(this).data('review-id');
         var $button = $(this);
-        $button.prop('disabled', true).text('Loading...'); // Add loading feedback
+        var updateType = $button.data('update-type');
+        var reviewId = $button.data('review-id');
 
-        $.ajax({
-            url: ctrw_admin_ajax.ajax_url,
-            method: 'POST',
-            data: {
-                action: 'get_review_details',
-                review_id: reviewId,
-                security: ctrw_admin_ajax.nonce
-            },
-            success: function(response) {
-                if (response.success) {
-                    var reviewData = response.data;
-                    $('#edit-review-id').val(reviewData.id);
-                    $('#update-type').val($button.data('update-type'));
-                    $('#edit-review-name').val(reviewData.name);
-                    $('#edit-review-email').val(reviewData.email);
-                    $('#edit-review-phone').val(reviewData.phone);
-                    $('#edit-review-website').val(reviewData.website);
-                    $('#edit-review-comment').val(reviewData.comment);
-                    $('#edit-review-city').val(reviewData.city);
-                    $('#edit-review-state').val(reviewData.state);
-                    $('#edit-review-status').val(reviewData.status);
-                    $('#edit-review-rating').val(reviewData.rating);
-                    $('#edit-review-title').val(reviewData.title);
-                    $('#edit-review-positionid').val(reviewData.positionid);
-                    $('#cr-edit-review-popup').show();
-                } else {
-                    alert('Error: ' + response.data.message);
+        // Reset the form before showing it
+        $('#edit-review-form')[0].reset();
+        $('#edit-review-id').val(''); // Clear hidden ID field
+
+        if (updateType === 'add') {
+            // --- HANDLE ADD ---
+            // Simply open the popup with a blank form
+            $('#update-type').val('add');
+            $('#cr-edit-review-popup h2').text('Add New Review'); // Optional: Change title for clarity
+            $('#cr-edit-review-popup').show();
+
+        } else {
+            // --- HANDLE EDIT ---
+            // Fetch the existing review data via AJAX
+            $button.prop('disabled', true).text('Loading...');
+
+            $.ajax({
+                url: ctrw_admin_ajax.ajax_url,
+                method: 'POST',
+                data: {
+                    action: 'get_review_details',
+                    review_id: reviewId,
+                    security: ctrw_admin_ajax.nonce
+                },
+                success: function(response) {
+                    if (response.success) {
+                        var reviewData = response.data;
+                        $('#update-type').val('update');
+                        $('#edit-review-id').val(reviewData.id);
+                        $('#edit-review-name').val(reviewData.name);
+                        $('#edit-review-email').val(reviewData.email);
+                        $('#edit-review-phone').val(reviewData.phone);
+                        $('#edit-review-website').val(reviewData.website);
+                        $('#edit-review-comment').val(reviewData.comment);
+                        $('#edit-review-city').val(reviewData.city);
+                        $('#edit-review-state').val(reviewData.state);
+                        $('#edit-review-status').val(reviewData.status);
+                        $('#edit-review-rating').val(reviewData.rating);
+                        $('#edit-review-title').val(reviewData.title);
+                        $('#edit-review-positionid').val(reviewData.positionid);
+                        $('#cr-edit-review-popup h2').text('Edit Review'); // Restore title
+                        $('#cr-edit-review-popup').show();
+                    } else {
+                        alert('Error: ' + response.data.message);
+                    }
+                },
+                error: function() {
+                    alert('An error occurred while fetching review details.');
+                },
+                complete: function() {
+                    $button.prop('disabled', false).text('Edit Review');
                 }
-            },
-            error: function() {
-                alert('An error occurred while fetching review details.');
-            },
-            complete: function() {
-                $button.prop('disabled', false).text('Edit Review'); // Restore button
-            }
-        });
+            });
+        }
     });
-    
+
     $('#close-edit-review-popup').on('click', function() {
         $('#cr-edit-review-popup').hide();
     });

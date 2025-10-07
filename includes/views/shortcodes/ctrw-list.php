@@ -115,38 +115,3 @@ $reviews = array_slice($filtered_reviews, $offset, $reviews_per_page);
     </div>
 </div>
 
-<script>
-jQuery(document).ready(function($) {
-    $(document).on('click', '.reviews-pagination a', function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        
-        var target = $('#reviews-container');
-        var scrollTo = target.offset().top - 20;
-        var page = $(this).data('page');
-        var postId = target.data('post-id');
-        
-        target.addClass('loading');
-        
-        $.ajax({
-            url: '<?php echo admin_url('admin-ajax.php'); ?>',
-            type: 'POST',
-            data: {
-                action: 'load_reviews_ajax',
-                page: page,
-                post_id: postId
-            },
-            success: function(response) {
-                target.html(response);
-                $('html, body').animate({scrollTop: scrollTo}, 300);
-            },
-            error: function(xhr, status, error) {
-                console.error('AJAX Error:', error);
-            },
-            complete: function() {
-                target.removeClass('loading');
-            }
-        });
-    });
-});
-</script>

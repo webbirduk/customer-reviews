@@ -322,7 +322,7 @@ class Review_Controller {
      * Enqueue Scripts and Styles
      */
     public function review_enqueue_scripts() {
-        wp_enqueue_script('review-script', CTRW_PLUGIN_ASSETS . 'js/review-script.js', ['jquery'], '1.0.2', true);
+        wp_enqueue_script('review-script', CTRW_PLUGIN_ASSETS . 'js/ctrw-frontend.js', ['jquery'], '1.0.2', true);
         wp_localize_script('review-script', 'ctrw_ajax', ['ajax_url' => admin_url('admin-ajax.php')]);
         wp_enqueue_style('ctrw-review-frontend', CTRW_PLUGIN_ASSETS . 'css/ctrw-frontend.css', [], '1.0.2');
         

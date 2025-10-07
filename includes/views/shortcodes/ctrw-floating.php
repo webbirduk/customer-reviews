@@ -105,34 +105,3 @@ $display_reviews = array_slice($reviews, 0, $reviews_per_page);
         </div>
     </div>
 </div>
-
-
-
-<script>
-jQuery(document).ready(function($) {
-    // Toggle widget visibility
-    $('.ctrw-floating-tab').on('click', function(e) {
-        e.stopPropagation();
-        $('.ctrw-floating-widget').toggleClass('active');
-    });
-    
-    // Close widget
-    $('.ctrw-close-btn').on('click', function(e) {
-        e.stopPropagation();
-        $('.ctrw-floating-widget').removeClass('active');
-    });
-    
-    // Close when clicking outside
-    $(document).on('click', function(e) {
-        if (!$(e.target).closest('.ctrw-floating-widget').length) {
-            $('.ctrw-floating-widget').removeClass('active');
-        }
-    });
-    
-    // View all reviews button handler
-    $('.ctrw-view-all-btn').on('click', function() {
-        // Implement your view all functionality here
-        alert('View all reviews functionality would go here');
-    });
-});
-</script>
