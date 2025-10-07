@@ -324,10 +324,7 @@ class Review_Controller {
     public function review_enqueue_scripts() {
         wp_enqueue_script('review-script', CTRW_PLUGIN_ASSETS . 'js/review-script.js', ['jquery'], '1.0.2', true);
         wp_localize_script('review-script', 'ctrw_ajax', ['ajax_url' => admin_url('admin-ajax.php')]);
-        wp_enqueue_style('ctrw-review-form', CTRW_PLUGIN_ASSETS . 'css/ctrw-form.css', [], '1.0.2');
-        wp_enqueue_style('ctrw-reviews-list', CTRW_PLUGIN_ASSETS . 'css/ctrw-reviews-list.css', [], '1.0.2');
-        wp_enqueue_style('ctrw-reviews-slider', CTRW_PLUGIN_ASSETS . 'css/ctrw-reviews-slider.css', [], '1.0.2');
-        wp_enqueue_style('ctrw-reviews-floating', CTRW_PLUGIN_ASSETS . 'css/ctrw-reviews-floating.css', [], '1.0.2');
+        wp_enqueue_style('ctrw-review-frontend', CTRW_PLUGIN_ASSETS . 'css/ctrw-frontend.css', [], '1.0.2');
         
         $settings = get_option('customer_reviews_settings');
         $star_color = !empty($settings['star_color']) ? sanitize_hex_color($settings['star_color']) : '#fbbc04';
@@ -357,9 +354,6 @@ class Review_Controller {
             }
 
             /* Floating Widget */
-            .ctrw-floating-widget {
-                --ctrw-primary: {$star_color};
-            }
             .ctrw-review-rating, .ctrw-title-icon {
                  color: {$star_color};
             }
@@ -375,7 +369,7 @@ class Review_Controller {
             }
         ";
         
-        wp_add_inline_style('ctrw-review-form', $custom_css);
+        wp_add_inline_style('ctrw-review-frontend', $custom_css);
     }
     
     public function wp_review_admin_styles($hook) {
