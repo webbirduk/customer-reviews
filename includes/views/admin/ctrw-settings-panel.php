@@ -24,7 +24,7 @@
                     <input type="number" name="reviews_per_page" id="reviews_per_page" 
                         value="<?= esc_attr(get_option('customer_reviews_settings')['reviews_per_page'] ?? 12) ?>">
 
-                        <label for="reviews_per_row_slder"><?php esc_html_e('Reviews per Row:', 'wp_cr'); ?></label>
+                        <label for="reviews_per_row_slder"><?php esc_html_e('Reviews slider per Row:', 'wp_cr'); ?></label>
                         <input type="number" name="reviews_per_row_slder" id="reviews_per_row_slder"
                             value="<?= esc_attr(get_option('customer_reviews_settings')['reviews_per_row_slder'] ?? 3) ?>" min="1" max="10">
                         <span class="ctrw-tooltip">
