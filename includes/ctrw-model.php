@@ -25,10 +25,10 @@ class CTRW_Model {
 
         $counts = [
             'all'      => 0,
-            'approved' => 0,
-            'reject'   => 0,
-            'pending'  => 0,
-            'trash'    => 0,
+            'Approved' => 0,
+            'Rejected'   => 0,
+            'Pending'  => 0,
+            'Trash'    => 0,
         ];
 
         $query = "SELECT status, COUNT(*) as count FROM $this->table GROUP BY status";
@@ -253,39 +253,6 @@ class CTRW_Model {
     public function update_review($id, $data) {
      
       return $this->wpdb->update($this->table, $data, ['id' => $id]);
-    }
-
-    public function delete_review($id) {
-        return $this->wpdb->delete($this->table, ['id' => $id]);
-    }
-
-    public function edit_customer_review($post) {
-        $data = [
-            'name' => sanitize_text_field($post['name']),
-            'email' => sanitize_email($post['email']),
-            'website' => esc_url($post['website']),
-            'phone' => sanitize_text_field($post['phone']),
-            'city' => sanitize_text_field($post['city']),
-            'state' => sanitize_text_field($post['state']),
-            'title' => sanitize_text_field($post['title']),
-            'comment' => sanitize_textarea_field($post['comment']),
-            'rating' => intval($post['rating']),
-            'status' => sanitize_text_field($post['status']),
-        ];
-        $id = intval($post['id']);
-
-        if ($this->wpdb->update($this->table, $data, ['id' => $id])) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    public function check_replace_woocommerce_reviews() {
-        $setting = get_option('customer_reviews_settings');
-        if (!empty($setting['replace_woocommerce_reviews'])) {
-            return true; // Return early if the setting is not enabled
-        }
     }
 
     public function get_review_count_by_status($status) {

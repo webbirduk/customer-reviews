@@ -1,5 +1,4 @@
 /* === CTRW FORM STYLES === */
-/* Source: ctrw-form.css */
 .customer-reviews-form-container {
       padding: 0px;
       border-radius: 8px;
@@ -122,12 +121,6 @@ line-height: 36pt;
     gap: 10px;
 }
 
-#reviews-container .like-button,
-#reviews-container .dislike-button {
-    cursor: pointer;
-    padding: 5px;
-}
-
 #reviews-container .admin-response {
     background: #f7f7f7;
     padding: 10px;
@@ -151,51 +144,6 @@ line-height: 36pt;
 #reviews-container .star.empty {
     color: lightgray;
     /* Gray for unselected stars */
-}
-
-#reviews-container .customer-reply {
-    margin-top: 15px;
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    background-color: #f9f9f9;
-}
-
-#reviews-container .customer-reply strong {
-    display: block;
-    margin-bottom: 10px;
-    font-size: 14px;
-    color: #333;
-}
-
-#reviews-container .customer-reply form {
-    display: flex;
-    flex-direction: column;
-}
-
-#reviews-container .customer-reply textarea {
-    width: 96%;
-    padding: 8px;
-    margin-bottom: 10px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    resize: vertical;
-    font-size: 14px;
-}
-
-#reviews-container .customer-reply button {
-    align-self: flex-start;
-    padding: 8px 15px;
-    background-color: #0073aa;
-    color: #fff;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 14px;
-}
-
-#reviews-container .customer-reply button:hover {
-    background-color: #005177;
 }
 
 #reviews-container .review-author {
@@ -237,7 +185,7 @@ line-height: 36pt;
 }
 
 /* === CTRW FLOATING WIDGET STYLES === */
-/* Source: ctrw-reviews-floating.css */
+
 .ctrw-floating-widget {
     position: fixed;
     right: 20px;
@@ -548,11 +496,10 @@ line-height: 36pt;
 }
 
 /* === CTRW SLIDER STYLES === */
-/* Source: ctrw-slider.php (inline) */
 .ctrw-slider-container {
    max-width: 1200px;
    margin: 40px auto;
-   padding: 0 40px; /* Increased padding to make space for external arrows */
+   padding: 0 40px; 
    position: relative;
    font-family: 'Inter', sans-serif;
    color: #333;
@@ -773,7 +720,6 @@ line-height: 36pt;
 }
 
 /* === CTRW SUMMARY WIDGET STYLES === */
-/* Source: ctrw-summary.php (inline) */
 .review-widget-container {
     background-color: #ffffff;
     border-radius: 8px;

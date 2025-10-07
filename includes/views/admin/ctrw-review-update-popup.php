@@ -33,10 +33,10 @@
                 <p>
                     <label for="edit-review-status"><strong>Status:</strong></label><br>
                     <select name="review_status" id="edit-review-status" style="width:100%;">
-                        <option value="approved">Approved</option>
-                        <option value="pending">Pending</option>
-                        <option value="rejected">Rejected</option>
-                        <option value="trash">Trash</option>
+                        <option value="Approved">Approved</option>
+                        <option value="Pending">Pending</option>
+                        <option value="Rejected">Rejected</option>
+                        <option value="Trash">Trash</option>
                     </select>
                 </p>
             </div>

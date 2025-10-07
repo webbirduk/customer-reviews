@@ -32,11 +32,11 @@ class CTRW_View {
     $total_pages = ceil($total_reviews / $per_page);
 
     $statuses = [
-        'all' => 'All',
-        'approved' => 'Approve',
-        'reject' => 'Reject',
-        'pending' => 'Pending',
-        'trash' => 'Trash'
+        'All' => 'All',
+        'Approved' => 'Approved',
+        'Rejected' => 'Rejected',
+        'Pending' => 'Pending',
+        'Trash' => 'Trash'
     ];
     echo '<h1 class="wp-heading-inline">Customer Reviews</h1>
     <button type="button" class="button edit-review" data-update-type="add">Add Customer Reviews</button>
