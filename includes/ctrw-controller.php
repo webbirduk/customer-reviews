@@ -303,13 +303,16 @@ class CTRW_Controller {
         if (!empty($review_ids)) {
             switch($action) {
                 case 'approve':
-                    $this->model->update_review_status($review_ids, 'approved');
+                    $this->model->update_review_status($review_ids, 'Approved');
                     break;
                 case 'reject':
-                    $this->model->update_review_status($review_ids, 'reject');
+                    $this->model->update_review_status($review_ids, 'Rejected');
+                    break;
+                case 'pending':
+                    $this->model->update_review_status($review_ids, 'Pending');
                     break;
                 case 'trash':
-                    $this->model->update_review_status($review_ids, 'trash');
+                    $this->model->update_review_status($review_ids, 'Trash');
                     break;
                 case 'delete_permanently':
                     $this->model->delete_reviews($review_ids);

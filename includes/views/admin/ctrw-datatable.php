@@ -19,6 +19,7 @@
             <select name="bulk_action">
                 <option value="">Bulk Actions</option>
                 <option value="approve">Approve</option>
+                <option value="pending">Pending</option>
                 <option value="reject">Reject</option>
                 <option value="trash">Move to Trash</option>
                 <?php if ($current_status === 'trash'): ?>
