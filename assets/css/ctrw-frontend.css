@@ -183,7 +183,7 @@
     background: #f5f5f5;
 }
 
-#reviews-container .reviews-pagination .current-page {
+#reviews-container span.page-numbers.current {
     background: #0073aa;
     color: white;
     border-color: #0073aa;
