@@ -30,7 +30,7 @@ class CTRW_Model {
      * @return array An array of review objects.
      */
     public function get_reviews_by_status(string $status): array {
-        if ('all' === $status) {
+        if ('All' === $status) {
             return $this->wpdb->get_results("SELECT * FROM {$this->table} ORDER BY created_at DESC");
         }
         return $this->wpdb->get_results(
