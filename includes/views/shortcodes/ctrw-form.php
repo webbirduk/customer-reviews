@@ -4,7 +4,7 @@
     <b class="ctrw-form-heading"><?php esc_html_e('Submit Your Review', 'customer-reviews'); ?></b>
     <form id="customer-reviews-form">
         <?php 
-        $fields = ['Name', 'Email', 'Website', 'Phone', 'City', 'State', 'Review Title', 'Comment', 'Rating'];
+        $fields = CTRW_Controller::get_review_form_fields();
         $settings_data = get_option('customer_reviews_settings');
         $form_fields_settings = $settings_data['fields'] ?? [];
 
