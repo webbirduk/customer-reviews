@@ -10,7 +10,7 @@
  * Copyright:            © 2019-2025 Artios Media (email : contact@artiosmedia.com).
  * License:              GPLv3 or later
  * License URI:          https://www.gnu.org/licenses/gpl-3.0.html
- * Text Domain:          customer-reviews
+ * Text Domain:          ctrw-reviews
  * Domain Path:          /languages
  * Tested up to:         6.8.1
  * Requires at least:    5.0

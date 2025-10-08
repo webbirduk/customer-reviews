@@ -17,22 +17,22 @@
 
     <form method="post"  id="ctrw-form-settings" class="wp-review-settings-form">
         <div class="form-group tab-section" id="tab-general" >
-            <h3><?php esc_html_e('General Settings', 'wp_cr'); ?></h3>
+            <h3><?php esc_html_e('General Settings', 'ctrw-reviews'); ?></h3>
             <div style="display: flex; flex-wrap: wrap; gap: 24px;">
                 <div style="flex: 1 1 0; min-width: 260px;">
-                    <label for="reviews_per_page"><?php esc_html_e('Reviews shown per page:', 'wp_cr'); ?></label>
+                    <label for="reviews_per_page"><?php esc_html_e('Reviews shown per page:', 'ctrw-reviews'); ?></label>
                     <input type="number" name="reviews_per_page" id="reviews_per_page" 
                         value="<?= esc_attr(get_option('customer_reviews_settings')['reviews_per_page'] ?? 12) ?>">
 
-                        <label for="reviews_per_row_slder"><?php esc_html_e('Reviews slider per Row:', 'wp_cr'); ?></label>
+                        <label for="reviews_per_row_slder"><?php esc_html_e('Reviews slider per Row:', 'ctrw-reviews'); ?></label>
                         <input type="number" name="reviews_per_row_slder" id="reviews_per_row_slder"
                             value="<?= esc_attr(get_option('customer_reviews_settings')['reviews_per_row_slder'] ?? 3) ?>" min="1" max="10">
                         <span class="ctrw-tooltip">
                             <span class="dashicons dashicons-editor-help"></span>
-                            <span class="tooltiptext tooltip-right-msg"><?php esc_html_e('Number of reviews to display horizontally in the Slider.', 'wp_cr'); ?></span>
+                            <span class="tooltiptext tooltip-right-msg"><?php esc_html_e('Number of reviews to display horizontally in the Slider.', 'ctrw-reviews'); ?></span>
                         </span>
 
-                    <label for="date_format"><?php esc_html_e('Date Format:', 'wp_cr'); ?></label>
+                    <label for="date_format"><?php esc_html_e('Date Format:', 'ctrw-reviews'); ?></label>
                     <select name="date_format" id="date_format">
                         <option value="MM/DD/YYYY" <?= selected(get_option('customer_reviews_settings')['date_format'] ?? '', 'MM/DD/YYYY', false) ?>>MM/DD/YYYY</option>
                         <option value="DD/MM/YYYY" <?= selected(get_option('customer_reviews_settings')['date_format'] ?? '', 'DD/MM/YYYY', false) ?>>DD/MM/YYYY</option>
@@ -41,7 +41,7 @@
 
                     <label for="include_time"><input type="checkbox" name="include_time" id="include_time" value="1" 
                     <?= checked(1, get_option('customer_reviews_settings')['include_time'] ?? 0, false) ?>> 
-                    <?php esc_html_e('Include Time', 'wp_cr'); ?>
+                    <?php esc_html_e('Include Time', 'ctrw-reviews'); ?>
                     <span class="ctrw-tooltip">
 					<span class="dashicons dashicons-editor-help"></span>
 					<span class="tooltiptext tooltip-right-msg">Display a time stamp behind the date on each comment.</span>
@@ -51,7 +51,7 @@
                    </label>
                     <label for="enable_email_notification"><input type="checkbox" name="enable_email_notification" id="enable_email_notification" value="1"
                     <?= checked(1, get_option('customer_reviews_settings')['enable_email_notification'] ?? 1, false) ?>> 
-                      <?php esc_html_e('Enable Admin Email Notification', 'wp_cr'); ?>
+                      <?php esc_html_e('Enable Admin Email Notification', 'ctrw-reviews'); ?>
                     <span class="ctrw-tooltip">
 					<span class="dashicons dashicons-editor-help"></span>
 					<span class="tooltiptext tooltip-right-msg">Email(s) designated under 'Advanced Settings' tab will receive a notification from each review entered in the plugins form.</span>
@@ -60,7 +60,7 @@
                   
                     <label for="enable_customer_email_notification"><input type="checkbox" name="enable_customer_email_notification" id="enable_customer_email_notification" value="1"
                     <?= checked(1, get_option('customer_reviews_settings')['enable_customer_email_notification'] ?? 0, false) ?>> 
-                     <?php esc_html_e('Enable Customer Email Receipt', 'wp_cr'); ?>
+                     <?php esc_html_e('Enable Customer Email Receipt', 'ctrw-reviews'); ?>
                     <span class="ctrw-tooltip">
 					<span class="dashicons dashicons-editor-help"></span>
 					<span class="tooltiptext tooltip-right-msg">Users receive a receipt from their form submission</span>
@@ -69,7 +69,7 @@
                     <label for="auto_approve_reviews">
                         <input type="checkbox" name="auto_approve_reviews" id="auto_approve_reviews" value="1"
                         <?= checked(1, get_option('customer_reviews_settings')['auto_approve_reviews'] ?? 0, false) ?>>
-                      <?php esc_html_e('Enable Automatic Review Approval', 'wp_cr'); ?>
+                      <?php esc_html_e('Enable Automatic Review Approval', 'ctrw-reviews'); ?>
                         <span class="ctrw-tooltip">
 					<span class="dashicons dashicons-editor-help"></span>
 					<span class="tooltiptext tooltip-right-msg">New reviews are immediately posted for viewing without admin review.</span>
@@ -79,7 +79,7 @@
                     <label for="show_city">
                         <input type="checkbox" name="show_city" id="show_city" value="1"
                         <?= checked(1, get_option('customer_reviews_settings')['show_city'] ?? 0, false) ?>>
-                     <?php esc_html_e('Show City in Review List', 'wp_cr'); ?>
+                     <?php esc_html_e('Show City in Review List', 'ctrw-reviews'); ?>
                         <span class="ctrw-tooltip">
 					<span class="dashicons dashicons-editor-help"></span>
 					<span class="tooltiptext tooltip-right-msg">This option allows the city to be displayed with each comment.</span>
@@ -89,7 +89,7 @@
                     <label for="show_state">
                         <input type="checkbox" name="show_state" id="show_state" value="1"
                         <?= checked(1, get_option('customer_reviews_settings')['show_state'] ?? 0, false) ?>>
-          <?php esc_html_e('Show State in Review List', 'wp_cr'); ?>
+          <?php esc_html_e('Show State in Review List', 'ctrw-reviews'); ?>
                         <span class="ctrw-tooltip">
 					<span class="dashicons dashicons-editor-help"></span>
 					<span class="tooltiptext tooltip-right-msg">This option allows the state to be displayed with each comment.</span>
@@ -98,7 +98,7 @@
                     </label>    <label for="enable_review_title">
                             <input type="checkbox" name="enable_review_title" id="enable_review_title" value="1"
                             <?= checked(1, get_option('customer_reviews_settings')['enable_review_title'] ?? 1, false) ?>>
-                               <?php esc_html_e('Enable Review Title', 'wp_cr'); ?>
+                               <?php esc_html_e('Enable Review Title', 'ctrw-reviews'); ?>
                             <span class="ctrw-tooltip">
 					<span class="dashicons dashicons-editor-help"></span>
 					<span class="tooltiptext tooltip-right-msg">This option allows the review title to be displayed with each comment.</span>
@@ -106,7 +106,7 @@
                          
                         </label>
 
-                    <label for="name_font_weight"><?php esc_html_e('Name Font Weight:', 'wp_cr'); ?></label>
+                    <label for="name_font_weight"><?php esc_html_e('Name Font Weight:', 'ctrw-reviews'); ?></label>
                     <select name="name_font_weight" id="name_font_weight">
                         <option value="normal" <?= selected(get_option('customer_reviews_settings')['name_font_weight'] ?? '', 'normal', false) ?>>Normal</option>
                         <option value="bold" <?= selected(get_option('customer_reviews_settings')['name_font_weight'] ?? '', 'bold', false) ?>>Bold</option>
@@ -119,29 +119,29 @@
 
                    
 
-                    <label for="comment_font_size"><?php esc_html_e('Comment Font Size In Pixels:', 'wp_cr'); ?></label>
+                    <label for="comment_font_size"><?php esc_html_e('Comment Font Size In Pixels:', 'ctrw-reviews'); ?></label>
                     <input type="number" name="comment_font_size" id="comment_font_size" 
                         value="<?= esc_attr(get_option('customer_reviews_settings')['comment_font_size'] ?? 14) ?>" min="1">
                     
                     
-                    <label for="comment_line_height"><?php esc_html_e('Comment Line Height In Pixels:', 'wp_cr'); ?></label>
+                    <label for="comment_line_height"><?php esc_html_e('Comment Line Height In Pixels:', 'ctrw-reviews'); ?></label>
                     <input type="number" step="0.1" min="1" name="comment_line_height" id="comment_line_height"
                         value="<?= esc_attr(get_option('customer_reviews_settings')['comment_line_height'] ?? 23) ?>">
 
-        <label for="comment_font_style"><?php esc_html_e('Comment Font Style:', 'wp_cr'); ?></label>
+        <label for="comment_font_style"><?php esc_html_e('Comment Font Style:', 'ctrw-reviews'); ?></label>
                     <select name="comment_font_style" id="comment_font_style">
                         <option value="normal" <?= selected(get_option('customer_reviews_settings')['comment_font_style'] ?? '', 'normal', false) ?>>Normal</option>
                         <option value="italic" <?= selected(get_option('customer_reviews_settings')['comment_font_style'] ?? '', 'italic', false) ?>>Italic</option>
                     </select>
 
-                    <label for="comment_box_fill_color"><?php esc_html_e('Comment Box Fill Color:', 'wp_cr'); ?></label>
+                    <label for="comment_box_fill_color"><?php esc_html_e('Comment Box Fill Color:', 'ctrw-reviews'); ?></label>
                     <?php
                     $comment_box_fill_color = get_option('customer_reviews_settings')['comment_box_fill_color'] ?? '#f5f5f5';
                     ?>
                     <input type="text" name="comment_box_fill_color" id="comment_box_fill_color"
                         value="<?= esc_attr($comment_box_fill_color) ?>" class="wp-color-picker-field" data-default-color="#f5f5f5">
 
-                    <label for="star_color"><?php esc_html_e('Star Color:', 'wp_cr'); ?></label>
+                    <label for="star_color"><?php esc_html_e('Star Color:', 'ctrw-reviews'); ?></label>
                     <?php
                     $star_color = get_option('customer_reviews_settings')['star_color'] ?? '#fbbc04';
                     ?>
@@ -153,7 +153,7 @@
         </div>
 
        <div class="tab-section" id="tab-review_form" style="display:none">
-            <h3><?php esc_html_e('Review Form Fields Settings', 'wp_cr'); ?></h3>
+            <h3><?php esc_html_e('Review Form Fields Settings', 'ctrw-reviews'); ?></h3>
             
             <div class="ctrw-settings-fields-grid" style="display: flex; gap: 32px;">
                 <?php 
@@ -223,7 +223,7 @@
         </div>
 
         <div class="form-group tab-section" id="tab-display" style="display:none">
-            <h3><?php esc_html_e('Shortcodes', 'wp_cr'); ?></h3>
+            <h3><?php esc_html_e('Shortcodes', 'ctrw-reviews'); ?></h3>
             <div class="shortcode-section">
                 <label for="shortcode-form">Reviews Form:</label>
                 <input type="text" id="shortcode-form" value="[wp_ctrw_form]" readonly>
@@ -253,7 +253,7 @@
 
 
         <div class="form-group tab-section" id="tab-schema" style="display:none">
-            <h3><?php esc_html_e('Schema Settings', 'wp_cr'); ?></h3>
+            <h3><?php esc_html_e('Schema Settings', 'ctrw-reviews'); ?></h3>
             <?php
             $schemaSettings = get_option('customer_reviews_settings');
             ?>
@@ -334,23 +334,23 @@
         </div>
 
         <div class="form-group tab-section" id="tab-advanced" style="display:none">
-            <h3><?php esc_html_e('Advanced Settings', 'wp_cr'); ?></h3>
+            <h3><?php esc_html_e('Advanced Settings', 'ctrw-reviews'); ?></h3>
             <label for="replace_woocommerce_reviews">
                 <input type="checkbox" name="replace_woocommerce_reviews" id="replace_woocommerce_reviews" value="1"
                 <?= checked(1, get_option('customer_reviews_settings')['replace_woocommerce_reviews'] ?? 0, false) ?>>
-                <?php esc_html_e('Replace WooCommerce Default Review System', 'wp_cr'); ?>
+                <?php esc_html_e('Replace WooCommerce Default Review System', 'ctrw-reviews'); ?>
             </label>
 
-            <label for="review_display_type"><?php esc_html_e('WooCommerce Reviews Display Style:', 'wp_cr'); ?></label>
+            <label for="review_display_type"><?php esc_html_e('WooCommerce Reviews Display Style:', 'ctrw-reviews'); ?></label>
             <select name="review_display_type" id="review_display_type">
-                <option value="list" <?= selected(get_option('customer_reviews_settings')['review_display_type'] ?? 'list', 'list', false) ?>><?php esc_html_e('List', 'wp_cr'); ?></option>
-                <option value="slider" <?= selected(get_option('customer_reviews_settings')['review_display_type'] ?? '', 'slider', false) ?>><?php esc_html_e('Slider', 'wp_cr'); ?></option>
-                <option value="floating" <?= selected(get_option('customer_reviews_settings')['review_display_type'] ?? '', 'floating', false) ?>><?php esc_html_e('Floating Widget', 'wp_cr'); ?></option>
+                <option value="list" <?= selected(get_option('customer_reviews_settings')['review_display_type'] ?? 'list', 'list', false) ?>><?php esc_html_e('List', 'ctrw-reviews'); ?></option>
+                <option value="slider" <?= selected(get_option('customer_reviews_settings')['review_display_type'] ?? '', 'slider', false) ?>><?php esc_html_e('Slider', 'ctrw-reviews'); ?></option>
+                <option value="floating" <?= selected(get_option('customer_reviews_settings')['review_display_type'] ?? '', 'floating', false) ?>><?php esc_html_e('Floating Widget', 'ctrw-reviews'); ?></option>
             </select><br> <p id="review_display_info"></p>
 
             <div style="margin-top: 18px;">
                 <label for="notification_admin_emails">
-                    <?php esc_html_e('Notification Admin Emails', 'wp_cr'); ?>
+                    <?php esc_html_e('Notification Admin Emails', 'ctrw-reviews'); ?>
                     <span class="ctrw-tooltip">
                         <span class="dashicons dashicons-editor-help"></span>
                         <span class="tooltiptext tooltip-right-msg">If more than one email, separate with a comma.</span>

@@ -234,7 +234,7 @@ class CTRW_Controller {
         ob_start();
         ?>
         <fieldset class="options-group">
-            <legend><?php esc_html_e('Show/Hide Columns', 'wp_cr'); ?></legend>
+            <legend><?php esc_html_e('Show/Hide Columns', 'ctrw-reviews'); ?></legend>
             <?php foreach ($defaults as $col => $def): ?>
                 <label style="margin-right:10px;">
                     <input type="checkbox" class="ctrw-toggle-col" data-col="<?php echo esc_attr($col); ?>" <?php checked($columns[$col]); ?>>
@@ -605,7 +605,7 @@ class CTRW_Controller {
      */
     private function notify_customer_of_pending_review($email, $name, $status) {
         if (empty($email)) return;
-        $subject = __('Thank you for your review', 'wp_cr');
+        $subject = __('Thank you for your review', 'ctrw-reviews');
         $message = sprintf(__("Thank you %s for your review! It is now currently %s.", 'wp_cr'), $name, $status);
         wp_mail($email, $subject, $message);
     }
