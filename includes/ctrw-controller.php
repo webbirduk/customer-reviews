@@ -110,6 +110,8 @@ class CTRW_Controller {
         // AJAX hook for logged-in users only
         add_action('wp_ajax_get_review_details', [$this, 'get_review_details_ajax']);
         add_action('wp_ajax_ctrw_save_settings', [$this, 'ctrw_save_settings']);
+        // AJAX hook for importing reviews from other plugins (admin only)
+        add_action('wp_ajax_ctrw_import_review_from_others', [$this, 'ctrw_import_review_from_others']);
     }
 
     /**
@@ -337,7 +339,7 @@ class CTRW_Controller {
     /**
      * Import reviews from other plugins via AJAX.
      */
-    public function ctrw_import_reviews() {
+    public function ctrw_import_review_from_others() {
         check_ajax_referer('ctrw_nonce', 'security');
         $importPlugin = isset($_POST['ctrw_import_review']) ? sanitize_text_field($_POST['ctrw_import_review']) : '';
         
