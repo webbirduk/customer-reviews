@@ -157,7 +157,7 @@
             
             <div class="ctrw-settings-fields-grid" style="display: flex; gap: 32px;">
                 <?php 
-                $fields = CTRW_Controller::get_review_form_fields();
+                $fields = CTRW_Controller::ctrw_get_review_form_fields();
                 $fields_col1 = array_slice($fields, 0, 6);
                 $fields_col2 = array_slice($fields, 6, 3);
                 ?>

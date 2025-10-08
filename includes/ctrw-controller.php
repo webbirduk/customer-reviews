@@ -835,4 +835,13 @@ class CTRW_Controller {
         
         echo '<script type="application/ld+json">' . wp_json_encode($schema, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . '</script>';
     }
+
+    /**
+     * Returns the list of available review form fields.
+     *
+     * @return array The list of form field labels.
+     */
+    public static function ctrw_get_review_form_fields() {
+        return ['Name', 'Email', 'Website', 'Phone', 'City', 'State', 'Review Title', 'Comment', 'Rating'];
+    }
 }
