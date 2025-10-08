@@ -559,7 +559,7 @@ class CTRW_Controller {
      * Handles review submission from the frontend form.
      */
     public function submit_review() {
-       // check_ajax_referer('ctrw_frontend_nonce', 'nonce');
+       check_ajax_referer('ctrw_frontend_nonce', 'nonce');
 
         $data = array_map('sanitize_text_field', $_POST);
         $settings = get_option('customer_reviews_settings');
@@ -669,9 +669,8 @@ class CTRW_Controller {
     /**
      * AJAX handler for loading reviews with pagination.
      */
-    public function load_reviews_ajax_handler() {
-        // Add the security check. This will use the same nonce from the review form.
-       // check_ajax_referer('ctrw_frontend_nonce', 'nonce');
+    public function load_reviews_ajax() {
+        check_ajax_referer('ctrw_frontend_nonce', 'nonce');
 
         $page = isset($_POST['page']) ? max(1, intval($_POST['page'])) : 1;
         $post_id = isset($_POST['post_id']) ? intval($_POST['post_id']) : 0;
@@ -680,7 +679,6 @@ class CTRW_Controller {
         include(CTRW_PLUGIN_PATH . 'includes/views/shortcodes/ctrw-list.php');
         $content = ob_get_clean();
         
-        // Send a proper JSON response, which the JavaScript file expects.
         wp_send_json_success(['html' => $content]);
     }
 
