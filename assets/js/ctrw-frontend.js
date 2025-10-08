@@ -1,4 +1,5 @@
 jQuery(document).ready(function ($) {
+   
     // Section: Review Submission Form
     const $reviewForm = $("#customer-reviews-form");
     if ($reviewForm.length) {
@@ -7,9 +8,24 @@ jQuery(document).ready(function ($) {
             const $submitButton = $(this).find('#comment-submit');
             const $message = $("#review-message");
             
-            let formData = $reviewForm.serialize();
-            formData += "&action=submit_review";
-            formData += "&nonce=" + ctrw_ajax.nonce; 
+            // Check if the ctrw_ajax object and nonce are available
+            if (typeof ctrw_ajax === 'undefined' || typeof ctrw_ajax.nonce === 'undefined') {
+                $message.html("❌ A configuration error occurred. Please contact support.").css("color", "red").fadeIn();
+                console.error("ctrw_ajax object or nonce is not defined.");
+                return; // Stop the function
+            }
+            
+            // Create a data object from the form
+            const formData = {
+                action: 'submit_review',
+                nonce: ctrw_ajax.nonce
+            };
+
+            // Add all form fields to the data object
+            const formFields = $reviewForm.serializeArray();
+            $.each(formFields, function(i, field){
+                formData[field.name] = field.value;
+            });
 
             // Add feedback to user
             $submitButton.prop('disabled', true).val('Submitting...');
@@ -18,14 +34,13 @@ jQuery(document).ready(function ($) {
             $.ajax({
                 url: ctrw_ajax.ajax_url,
                 method: "POST",
-                data: formData,
-                dataType: 'json', // Expect a JSON response
+                data: formData, // Send the data object
+                dataType: 'json',
                 success: function (response) {
                     if (response.success) {
                         $message.html("✅ " + response.data.message).css("color", "green").fadeIn();
                         $reviewForm[0].reset();
                     } else {
-                        // Display specific error message from server if available
                         const errorMessage = response.data.message || 'Error submitting review.';
                         $message.html("❌ " + errorMessage).css("color", "red").fadeIn();
                     }
@@ -40,7 +55,6 @@ jQuery(document).ready(function ($) {
             });
         });
     }
-
     // Section: Review List Pagination (AJAX)
     $(document).on('click', '.reviews-pagination a', function(e) {
         e.preventDefault();

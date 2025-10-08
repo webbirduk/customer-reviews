@@ -1,67 +1,136 @@
 <?php
 if (!defined('ABSPATH')) {
-    exit;
+    exit; // Exit if accessed directly.
 }
 
+/**
+ * CTRW_Controller Class
+ *
+ * Handles the core logic of the Customer Reviews plugin,
+ * including registering hooks, handling AJAX requests, and rendering views.
+ */
 class CTRW_Controller {
+
+    /**
+     * The model for database interactions.
+     *
+     * @var CTRW_Model
+     */
     private $model;
+
+    /**
+     * The view for rendering output.
+     *
+     * @var CTRW_View
+     */
     private $view;
 
+    /**
+     * Constructor.
+     *
+     * Initializes the model and view, and registers all necessary hooks.
+     */
     public function __construct() {
         $this->model = new CTRW_Model();
-        $this->view = new CTRW_View();
+        $this->view  = new CTRW_View();
         
-        // Initialize hooks
         $this->initialize_hooks();
     }
 
+    /**
+     * Initializes all WordPress hooks for the plugin.
+     */
     private function initialize_hooks() {
-        // Admin hooks
+        $this->register_admin_hooks();
+        $this->register_plugin_meta_hooks();
+        $this->register_frontend_hooks();
+        $this->register_woocommerce_hooks();
+        $this->register_ajax_hooks();
+        $this->register_shortcodes();
+
+        // Other general hooks
+        add_filter('set-screen-option', [$this, 'save_screen_option'], 10, 3);
+    }
+
+    /**
+     * Registers all hooks related to the WordPress admin area.
+     */
+    private function register_admin_hooks() {
         add_action('admin_menu', [$this, 'add_admin_menu']);
-        add_action('admin_enqueue_scripts', [$this,'wp_review_admin_styles']);
+        add_action('admin_enqueue_scripts', [$this, 'wp_review_admin_styles']);
         add_action('load-toplevel_page_customer-reviews', [$this, 'add_screen_options']);
         add_action('wp_ajax_ctrw_save_column_visibility', [$this, 'save_column_visibility']);
+    }
 
-        // Plugin list page links
+    /**
+     * Registers hooks for the plugin's action and meta links.
+     */
+    private function register_plugin_meta_hooks() {
         add_filter('plugin_action_links_' . CTRW_BASE_NAME, [$this, 'ctrw_plugin_action_links']);
         add_filter('plugin_row_meta', [$this, 'add_ctrw_description_link'], 10, 2);
         add_filter('plugin_row_meta', [$this, 'add_ctrw_details_link'], 10, 4);
+    }
 
-        // Frontend hooks
-        add_action('wp_enqueue_scripts', [$this,'review_enqueue_scripts']);
+    /**
+     * Registers hooks for the frontend of the site.
+     */
+    private function register_frontend_hooks() {
+        add_action('wp_enqueue_scripts', [$this, 'review_enqueue_scripts']);
         add_action('wp_head', [$this, 'ctrw_output_schema_markup']);
+    }
 
-        // WooCommerce Integration Hooks
+    /**
+     * Registers hooks for WooCommerce integration.
+     */
+    private function register_woocommerce_hooks() {
         add_action('woocommerce_after_shop_loop_item_title', [$this, 'ctrw_display_product_review_info'], 15);
         add_action('woocommerce_single_product_summary', [$this, 'ctrw_display_product_review_info'], 7);
         add_filter('woocommerce_product_tabs', [$this, 'replace_reviews_tab_with_custom_plugin']);
         add_action('init', [$this, 'disable_default_woocommerce_reviews']);
+    }
 
-        // AJAX hooks
-        add_action('wp_ajax_ctrw_save_settings', [$this, 'ctrw_save_settings']);
-        add_action('wp_ajax_submit_review', [$this, 'submit_review']);
-        add_action('wp_ajax_nopriv_submit_review', [$this, 'submit_review']);
-        add_action('wp_ajax_save_review_reply', [$this, 'save_review_reply']);
-        add_action('wp_ajax_nopriv_save_review_reply', [$this, 'save_review_reply']);
-        add_action('wp_ajax_edit_customer_review', [$this, 'edit_customer_review']);
-        add_action('wp_ajax_nopriv_edit_customer_review', [$this, 'edit_customer_review']);
-        add_action('wp_ajax_ctrw_import_review_from_others', [$this, 'ctrw_import_reviews']);
-        add_action('wp_ajax_nopriv_ctrw_import_review_from_others', [$this, 'ctrw_import_reviews']);
-        add_action('wp_ajax_load_reviews_ajax', [$this, 'load_reviews_ajax_handler']);
-        add_action('wp_ajax_nopriv_load_reviews_ajax', [$this, 'load_reviews_ajax_handler']);
+    /**
+     * Registers all AJAX action hooks.
+     */
+    private function register_ajax_hooks() {
+        // AJAX hooks for both logged-in and non-logged-in users
+        $ajax_actions = [
+            'submit_review',
+            'save_review_reply',
+            'edit_customer_review',
+            'ctrw_import_review_from_others',
+            'load_reviews_ajax',
+        ];
+
+        foreach ($ajax_actions as $action) {
+            add_action("wp_ajax_{$action}", [$this, $action]);
+            add_action("wp_ajax_nopriv_{$action}", [$this, $action]);
+        }
+        
+        // AJAX hook for logged-in users only
         add_action('wp_ajax_get_review_details', [$this, 'get_review_details_ajax']);
+        add_action('wp_ajax_ctrw_save_settings', [$this, 'ctrw_save_settings']);
+    }
 
-        // Shortcodes and other hooks
-        add_shortcode('wp_ctrw_form', [$this,'customer_reviews_form_shortcode']);
-        add_shortcode('wp_ctrw_summary', [$this,'ctrw_display_summary']);
-        add_shortcode('wp_ctrw_lists', [$this,'customer_reviews_list_shortcode']);
-        add_shortcode('wp_ctrw_widget', [$this,'ctrw_display_floating_widget']);
-        add_shortcode('wp_ctrw_slider', [$this,'ctrw_display_slider']);
-        add_filter('set-screen-option', [$this, 'save_screen_option'], 10, 3);
+    /**
+     * Registers all shortcodes for the plugin.
+     */
+    private function register_shortcodes() {
+        add_shortcode('wp_ctrw_form', [$this, 'customer_reviews_form_shortcode']);
+        add_shortcode('wp_ctrw_summary', [$this, 'ctrw_display_summary']);
+        add_shortcode('wp_ctrw_lists', [$this, 'customer_reviews_list_shortcode']);
+        add_shortcode('wp_ctrw_widget', [$this, 'ctrw_display_floating_widget']);
+        add_shortcode('wp_ctrw_slider', [$this, 'ctrw_display_slider']);
     }
     
     /**
      * Plugin Activation and Uninstallation - MUST BE STATIC
+     */
+
+    /**
+     * Activation hook.
+     *
+     * Creates the custom database table for reviews.
      */
     public static function activate() {
         global $wpdb;
@@ -95,6 +164,11 @@ class CTRW_Controller {
         dbDelta($sql);
     }
     
+    /**
+     * Uninstall hook.
+     *
+     * Removes all plugin data from the database.
+     */
     public static function uninstall() {
         global $wpdb;
         $table_name = $wpdb->prefix . 'customer_reviews';
@@ -122,7 +196,7 @@ class CTRW_Controller {
     }
 
     /**
-     * Screen Options for the admin reviews table
+     * Screen Options for the admin reviews table.
      */
     public function add_screen_options() {
         $option = 'per_page';
@@ -135,6 +209,13 @@ class CTRW_Controller {
         add_filter('screen_settings', [$this, 'screen_settings_html'], 10, 2);
     }
 
+    /**
+     * Renders the HTML for the screen options.
+     *
+     * @param string $settings The existing screen settings HTML.
+     * @param WP_Screen $screen The current screen object.
+     * @return string The modified screen settings HTML.
+     */
     public function screen_settings_html($settings, $screen) {
         if ($screen->id !== 'toplevel_page_customer-reviews') {
             return $settings;
@@ -169,6 +250,14 @@ class CTRW_Controller {
         return $settings . ob_get_clean();
     }
     
+    /**
+     * Saves the screen options.
+     *
+     * @param mixed  $status The value to save.
+     * @param string $option The option name.
+     * @param mixed  $value  The value of the option.
+     * @return mixed The saved value.
+     */
     public function save_screen_option($status, $option, $value) {
         if ($option === 'ctrw_reviews_per_page') {
             return $value;
@@ -176,6 +265,9 @@ class CTRW_Controller {
         return $status;
     }
     
+    /**
+     * Saves column visibility settings via AJAX.
+     */
     public function save_column_visibility() {
         check_ajax_referer('ctrw_nonce', 'security');
         if (!current_user_can('manage_options')) {
@@ -189,9 +281,16 @@ class CTRW_Controller {
     /**
      * WooCommerce Integration
      */
+
+    /**
+     * Replaces the default WooCommerce reviews tab with the custom one.
+     *
+     * @param array $tabs The existing WooCommerce product tabs.
+     * @return array The modified tabs.
+     */
     public function replace_reviews_tab_with_custom_plugin($tabs) {
         $setting = get_option('customer_reviews_settings');
-        if(empty($setting['replace_woocommerce_reviews'])) {
+        if (empty($setting['replace_woocommerce_reviews'])) {
             return $tabs;
         }
         unset($tabs['reviews']);
@@ -203,6 +302,9 @@ class CTRW_Controller {
         return $tabs;
     }
 
+    /**
+     * Renders the content for the custom reviews tab in WooCommerce.
+     */
     public function render_custom_reviews_tab_content() {
         $settings = get_option('customer_reviews_settings');
         $display_type = $settings['review_display_type'] ?? 'list';
@@ -212,7 +314,7 @@ class CTRW_Controller {
         if ($display_type === 'slider') {
             echo do_shortcode('[wp_ctrw_slider]');
         } elseif ($display_type === 'floating') {
-             echo do_shortcode('[wp_ctrw_widget]');
+            echo do_shortcode('[wp_ctrw_widget]');
         } else {
             echo do_shortcode('[wp_ctrw_lists]');
         }
@@ -221,18 +323,22 @@ class CTRW_Controller {
         echo '</div>';
     }
 
+    /**
+     * Disables the default WooCommerce reviews system if the setting is enabled.
+     */
     public function disable_default_woocommerce_reviews() {
         $setting = get_option('customer_reviews_settings');
-        if(!empty($setting['replace_woocommerce_reviews'])) {
+        if (!empty($setting['replace_woocommerce_reviews'])) {
             update_option('woocommerce_enable_reviews', 'no');
             update_option('woocommerce_enable_review_rating', 'no');
         }
     }
     
     /**
-     * Import reviews from other plugins.
+     * Import reviews from other plugins via AJAX.
      */
     public function ctrw_import_reviews() {
+        check_ajax_referer('ctrw_nonce', 'security');
         $importPlugin = isset($_POST['ctrw_import_review']) ? sanitize_text_field($_POST['ctrw_import_review']) : '';
         
         if ($importPlugin == 'siteReviews') {
@@ -249,6 +355,13 @@ class CTRW_Controller {
     /**
      * Add links to the plugin list page
      */
+
+    /**
+     * Adds a settings link to the plugin's action links.
+     *
+     * @param array $links The existing action links.
+     * @return array The modified action links.
+     */
     public function ctrw_plugin_action_links($links) {
         unset($links['edit']);
         $settings_link = '<a href="' . admin_url('admin.php?page=wp-review-settings') . '">' . __('Settings', 'wp_cr') . '</a>';
@@ -256,6 +369,13 @@ class CTRW_Controller {
         return $links;
     }
 
+    /**
+     * Adds a donation link to the plugin's meta links.
+     *
+     * @param array  $links The existing meta links.
+     * @param string $file  The plugin file path.
+     * @return array The modified meta links.
+     */
     public function add_ctrw_description_link($links, $file) {
         if (CTRW_BASE_NAME == $file) {
             $row_meta = [
@@ -266,6 +386,14 @@ class CTRW_Controller {
         return $links;
     }
 
+    /**
+     * Adds a "View Details" link to the plugin's meta links.
+     *
+     * @param array  $links       The existing meta links.
+     * @param string $plugin_file The plugin file path.
+     * @param array  $plugin_data The plugin data.
+     * @return array The modified meta links.
+     */
     public function add_ctrw_details_link($links, $plugin_file, $plugin_data) {
         if (isset($plugin_data['PluginURI']) && strpos($plugin_data['PluginURI'], 'wordpress.org/plugins/customer-reviews') !== false) {
             $slug = basename($plugin_data['PluginURI']);
@@ -278,15 +406,25 @@ class CTRW_Controller {
     /**
      * Admin Menu and Pages
      */
+
+    /**
+     * Adds the admin menu pages for the plugin.
+     */
     public function add_admin_menu() {
         add_menu_page('Reviews', 'Reviews', 'manage_options', 'customer-reviews', [$this, 'display_reviews_page'], 'dashicons-star-filled');
         add_submenu_page('customer-reviews', 'Review Settings', 'Review Settings', 'manage_options', 'wp-review-settings', [$this, 'display_settings_page']);
     }
 
+    /**
+     * Displays the settings page.
+     */
     public function display_settings_page() {
         include CTRW_PLUGIN_PATH . 'includes/views/admin/ctrw-settings-panel.php';
     }
     
+    /**
+     * Displays the main reviews management page.
+     */
     public function display_reviews_page() {
         if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['bulk_action']) && !empty($_POST['review_ids'])) {
             $this->handle_bulk_action();
@@ -297,6 +435,9 @@ class CTRW_Controller {
         $this->view->display_reviews($reviews, $counts, $status);
     }
 
+    /**
+     * Handles bulk actions submitted from the reviews list table.
+     */
     private function handle_bulk_action() {
         $action = sanitize_text_field($_POST['bulk_action']);
         $review_ids = array_map('intval', $_POST['review_ids']);
@@ -307,9 +448,6 @@ class CTRW_Controller {
                     break;
                 case 'reject':
                     $this->model->update_review_status($review_ids, 'Rejected');
-                    break;
-                case 'pending':
-                    $this->model->update_review_status($review_ids, 'Pending');
                     break;
                 case 'trash':
                     $this->model->update_review_status($review_ids, 'Trash');
@@ -324,57 +462,33 @@ class CTRW_Controller {
     /**
      * Enqueue Scripts and Styles
      */
+
+    /**
+     * Enqueues frontend scripts and styles.
+     */
     public function review_enqueue_scripts() {
-        wp_enqueue_script('review-script', CTRW_PLUGIN_ASSETS . 'js/ctrw-frontend.js', ['jquery'], '1.0.2', true);
-        wp_localize_script('review-script', 'ctrw_ajax', ['ajax_url' => admin_url('admin-ajax.php')]);
+        wp_enqueue_script('ctrw-review-script', CTRW_PLUGIN_ASSETS . 'js/ctrw-frontend.js', ['jquery'], '1.0.2', true);
+        wp_localize_script('ctrw-review-script', 'ctrw_ajax', [
+            'ajax_url' => admin_url('admin-ajax.php'),
+            'nonce' => wp_create_nonce('ctrw_frontend_nonce')
+        ]);
         wp_enqueue_style('ctrw-review-frontend', CTRW_PLUGIN_ASSETS . 'css/ctrw-frontend.css', [], '1.0.2');
         
         $settings = get_option('customer_reviews_settings');
         $star_color = !empty($settings['star_color']) ? sanitize_hex_color($settings['star_color']) : '#fbbc04';
         
-        // Comprehensive inline CSS for dynamic star color
         $custom_css = "
-            /* Review Form */
-            .rating label:hover,
-            .rating label:hover ~ label,
-            .rating input:checked ~ label {
-                color: {$star_color} !important;
-            }
-
-            /* Review List & WooCommerce Summary */
-            .star.filled, .ctrw-stars {
-                color: {$star_color};
-            }
-
-            /* Review Summary Widget */
-            .star-display .star-filled,
-            .star-display .star-half:after,
-            .rating-bar-row .star-label {
-                color: {$star_color};
-            }
-            .bar-foreground {
-                background-color: {$star_color};
-            }
-
-            /* Floating Widget */
-            .ctrw-review-rating, .ctrw-title-icon {
-                 color: {$star_color};
-            }
-             .ctrw-admin-reply .ctrw-reply-header svg path {
-                stroke: {$star_color};
-            }
-
-
-            /* Slider */
-            .ctrw-slider-rating .filled,
-             .ctrw-header-rating {
-                color: {$star_color};
-            }
+            :root { --ctrw-star-color: {$star_color}; }
         ";
         
         wp_add_inline_style('ctrw-review-frontend', $custom_css);
     }
     
+    /**
+     * Enqueues admin scripts and styles.
+     *
+     * @param string $hook The current admin page hook.
+     */
     public function wp_review_admin_styles($hook) {
         if ($hook !== 'toplevel_page_customer-reviews' && $hook !== 'reviews_page_wp-review-settings') {
             return;
@@ -382,58 +496,71 @@ class CTRW_Controller {
         wp_enqueue_style('wp-color-picker');
         wp_enqueue_style('wp-review-admin', CTRW_PLUGIN_ASSETS . 'css/ctrw-admin.css', [], '1.0.2');
         wp_enqueue_script('cr-admin-script', CTRW_PLUGIN_ASSETS . 'js/ctrw-admin.js', ['jquery', 'wp-color-picker'], '1.0.2', true);
-        wp_localize_script('cr-admin-script', 'ctrw_admin_ajax', ['ajax_url' => admin_url('admin-ajax.php'), 'nonce' => wp_create_nonce('ctrw_nonce')]);
+        wp_localize_script('cr-admin-script', 'ctrw_admin_ajax', [
+            'ajax_url' => admin_url('admin-ajax.php'),
+            'nonce' => wp_create_nonce('ctrw_admin_nonce')
+        ]);
     }
 
     /**
      * AJAX Handlers
      */
+
+    /**
+     * Saves plugin settings via AJAX.
+     */
     public function ctrw_save_settings() {
-        check_ajax_referer('ctrw_nonce', 'security'); 
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-             $settings = [
-                'enable_email_notification' => isset($_POST['enable_email_notification']) ? 1 : 0,
-                'enable_customer_email_notification' => isset($_POST['enable_customer_email_notification']) ? 1 : 0,
-                'auto_approve_reviews' => isset($_POST['auto_approve_reviews']) ? 1 : 0,
-                'show_city' => isset($_POST['show_city']) ? 1 : 0,
-                'show_state' => isset($_POST['show_state']) ? 1 : 0,
-                'enable_review_title' => isset($_POST['enable_review_title']) ? 1 : 0,
-                'name_font_weight' => sanitize_text_field($_POST['name_font_weight'] ?? 'normal'),
-                'comment_font_size' => intval($_POST['comment_font_size'] ?? 14),
-                'comment_line_height' => floatval($_POST['comment_line_height'] ?? 1.5),
-                'comment_font_style' => sanitize_text_field($_POST['comment_font_style'] ?? 'normal'),
-                'comment_box_fill_color' => sanitize_hex_color($_POST['comment_box_fill_color'] ?? '#f9f9f9'),
-                'reviews_per_page' => intval($_POST['reviews_per_page'] ?? 10),
-                'reviews_per_row_slder' => intval($_POST['reviews_per_row_slder'] ?? 3),
-                'date_format' => sanitize_text_field($_POST['date_format'] ?? 'MM/DD/YYYY'),
-                'include_time' => isset($_POST['include_time']) ? 1 : 0,
-                'star_color' => sanitize_hex_color($_POST['star_color'] ?? '#fbbc04'),
-                'enabled_schema' => isset($_POST['enabled_schema']) ? 1 : 0,
-                'business_name' => sanitize_text_field($_POST['business_name'] ?? get_bloginfo('name')),
-                'default_description' => sanitize_text_field($_POST['default_description'] ?? get_bloginfo('description')),
-                'default_url' => esc_url_raw($_POST['default_url'] ?? home_url('/')),
-                'custom_image_url' => esc_url_raw($_POST['custom_image_url'] ?? ''),
-                'business_address' => sanitize_text_field($_POST['business_address'] ?? ''),
-                'business_phone' => sanitize_text_field($_POST['business_phone'] ?? ''),
-                'price_range' => sanitize_text_field($_POST['price_range'] ?? '$'),
-                'review_display_type' => sanitize_text_field($_POST['review_display_type'] ?? 'list'),
-                'replace_woocommerce_reviews' => isset($_POST['replace_woocommerce_reviews']) ? 1 : 0,
-                'notification_admin_emails' => sanitize_text_field($_POST['notification_admin_emails'] ?? ''),   
-                'fields' => isset($_POST['fields']) ? array_map(function($field) {
-                    return [
-                        'label' => sanitize_text_field($field['label']),
-                        'require' => isset($field['require']) ? 1 : 0,
-                        'show' => isset($field['show']) ? 1 : 0
-                    ];
-                }, $_POST['fields']) : []
-            ];
-            update_option('customer_reviews_settings', $settings);
-            wp_send_json_success();
+        check_ajax_referer('ctrw_admin_nonce', 'nonce'); 
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error();
         }
-        wp_send_json_error();
+        
+        $settings = [
+            'enable_email_notification' => isset($_POST['enable_email_notification']) ? 1 : 0,
+            'enable_customer_email_notification' => isset($_POST['enable_customer_email_notification']) ? 1 : 0,
+            'auto_approve_reviews' => isset($_POST['auto_approve_reviews']) ? 1 : 0,
+            'show_city' => isset($_POST['show_city']) ? 1 : 0,
+            'show_state' => isset($_POST['show_state']) ? 1 : 0,
+            'enable_review_title' => isset($_POST['enable_review_title']) ? 1 : 0,
+            'name_font_weight' => sanitize_text_field($_POST['name_font_weight'] ?? 'normal'),
+            'comment_font_size' => intval($_POST['comment_font_size'] ?? 14),
+            'comment_line_height' => floatval($_POST['comment_line_height'] ?? 1.5),
+            'comment_font_style' => sanitize_text_field($_POST['comment_font_style'] ?? 'normal'),
+            'comment_box_fill_color' => sanitize_hex_color($_POST['comment_box_fill_color'] ?? '#f9f9f9'),
+            'reviews_per_page' => intval($_POST['reviews_per_page'] ?? 10),
+            'reviews_per_row_slder' => intval($_POST['reviews_per_row_slder'] ?? 3),
+            'date_format' => sanitize_text_field($_POST['date_format'] ?? 'MM/DD/YYYY'),
+            'include_time' => isset($_POST['include_time']) ? 1 : 0,
+            'star_color' => sanitize_hex_color($_POST['star_color'] ?? '#fbbc04'),
+            'enabled_schema' => isset($_POST['enabled_schema']) ? 1 : 0,
+            'business_name' => sanitize_text_field($_POST['business_name'] ?? get_bloginfo('name')),
+            'default_description' => sanitize_text_field($_POST['default_description'] ?? get_bloginfo('description')),
+            'default_url' => esc_url_raw($_POST['default_url'] ?? home_url('/')),
+            'custom_image_url' => esc_url_raw($_POST['custom_image_url'] ?? ''),
+            'business_address' => sanitize_text_field($_POST['business_address'] ?? ''),
+            'business_phone' => sanitize_text_field($_POST['business_phone'] ?? ''),
+            'price_range' => sanitize_text_field($_POST['price_range'] ?? '$'),
+            'review_display_type' => sanitize_text_field($_POST['review_display_type'] ?? 'list'),
+            'replace_woocommerce_reviews' => isset($_POST['replace_woocommerce_reviews']) ? 1 : 0,
+            'notification_admin_emails' => sanitize_text_field($_POST['notification_admin_emails'] ?? ''),   
+            'fields' => isset($_POST['fields']) ? array_map(function($field) {
+                return [
+                    'label' => sanitize_text_field($field['label']),
+                    'require' => isset($field['require']) ? 1 : 0,
+                    'show' => isset($field['show']) ? 1 : 0
+                ];
+            }, $_POST['fields']) : []
+        ];
+        update_option('customer_reviews_settings', $settings);
+        wp_send_json_success();
     }
      
+    /**
+     * Handles review submission from the frontend form.
+     */
     public function submit_review() {
+       // check_ajax_referer('ctrw_frontend_nonce', 'nonce');
+
         $data = array_map('sanitize_text_field', $_POST);
         $settings = get_option('customer_reviews_settings');
         $status = !empty($settings['auto_approve_reviews']) ? 'Approved' : 'Pending';
@@ -457,6 +584,13 @@ class CTRW_Controller {
         wp_send_json_success(['message' => 'Review submitted successfully!']);
     }
     
+    /**
+     * Notifies the customer about their review submission.
+     *
+     * @param string $email The customer's email address.
+     * @param string $name  The customer's name.
+     * @param string $status The status of the review.
+     */
     private function notify_customer_of_pending_review($email, $name, $status) {
         if (empty($email)) return;
         $subject = __('Thank you for your review', 'wp_cr');
@@ -464,6 +598,11 @@ class CTRW_Controller {
         wp_mail($email, $subject, $message);
     }
 
+    /**
+     * Notifies the admin about a new review submission.
+     *
+     * @param array $review_data The submitted review data.
+     */
     private function notify_admin_of_pending_review($review_data) {
         $settings = get_option('customer_reviews_settings');
         $admin_emails = !empty($settings['notification_admin_emails']) ? $settings['notification_admin_emails'] : get_option('admin_email');
@@ -473,50 +612,37 @@ class CTRW_Controller {
         $site_name = get_bloginfo('name');
         
         ob_start();
-        ?>
-        <div style="font-family: Arial, sans-serif; font-size: 14px; line-height: 1.6;">
-            <p>A new customer review has been submitted on <strong><?php echo esc_html($site_name); ?></strong>:</p>
-            <table style="width: 100%; border-collapse: collapse;">
-                <tr style="background-color: #f9f9f9;">
-                    <td style="padding: 8px; border: 1px solid #ddd; width: 120px;"><strong>Name:</strong></td>
-                    <td style="padding: 8px; border: 1px solid #ddd;"><?php echo esc_html($review_data['name']); ?></td>
-                </tr>
-                <tr>
-                    <td style="padding: 8px; border: 1px solid #ddd;"><strong>Email:</strong></td>
-                    <td style="padding: 8px; border: 1px solid #ddd;"><?php echo esc_html($review_data['email']); ?></td>
-                </tr>
-                <tr style="background-color: #f9f9f9;">
-                    <td style="padding: 8px; border: 1px solid #ddd;"><strong>Rating:</strong></td>
-                    <td style="padding: 8px; border: 1px solid #ddd;"><?php echo intval($review_data['rating']); ?> out of 5</td>
-                </tr>
-                <tr>
-                    <td style="padding: 8px; border: 1px solid #ddd;"><strong>Title:</strong></td>
-                    <td style="padding: 8px; border: 1px solid #ddd;"><?php echo esc_html($review_data['title']); ?></td>
-                </tr>
-                <tr style="background-color: #f9f9f9;">
-                    <td style="padding: 8px; border: 1px solid #ddd; vertical-align: top;"><strong>Comment:</strong></td>
-                    <td style="padding: 8px; border: 1px solid #ddd;"><?php echo nl2br(esc_html($review_data['comment'])); ?></td>
-                </tr>
-            </table>
-            <p>You can manage this review in the <a href="<?php echo admin_url('admin.php?page=customer-reviews'); ?>">WordPress admin panel</a>.</p>
-        </div>
-        <?php
+        include CTRW_PLUGIN_PATH . 'includes/views/emails/admin-notification.php';
         $message = ob_get_clean();
         
         $headers = ['Content-Type: text/html; charset=UTF-8'];
         wp_mail($admin_emails, $subject, $message, $headers);
     }
     
+    /**
+     * Saves the admin's reply to a review.
+     */
     public function save_review_reply() {
-        check_ajax_referer('ctrw_nonce', 'security');
+        check_ajax_referer('ctrw_admin_nonce', 'nonce');
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error();
+        }
+
         $id = intval($_POST['review_id']);
         $reply = sanitize_textarea_field($_POST['reply_message']);
         $this->model->update_review($id, ['admin_reply' => $reply]);
         wp_send_json_success(['reply' => $reply]);
     }
     
+    /**
+     * Handles editing or adding a customer review from the admin panel.
+     */
     public function edit_customer_review() {
-        check_ajax_referer('ctrw_nonce', 'security');
+        check_ajax_referer('ctrw_admin_nonce', 'nonce');
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error();
+        }
+
         $id = intval($_POST['id']);
         $update_type = sanitize_text_field($_POST['update_type']);
         $data = [
@@ -540,25 +666,29 @@ class CTRW_Controller {
         wp_send_json_success();
     }
     
+    /**
+     * AJAX handler for loading reviews with pagination.
+     */
     public function load_reviews_ajax_handler() {
-        if (!defined('DOING_AJAX') || !DOING_AJAX) wp_die();
+        // Add the security check. This will use the same nonce from the review form.
+       // check_ajax_referer('ctrw_frontend_nonce', 'nonce');
 
         $page = isset($_POST['page']) ? max(1, intval($_POST['page'])) : 1;
-        $post_id = isset($_POST['post_id']) ? intval($_POST['post_id']) : get_queried_object_id();
+        $post_id = isset($_POST['post_id']) ? intval($_POST['post_id']) : 0;
         
         ob_start();
         include(CTRW_PLUGIN_PATH . 'includes/views/shortcodes/ctrw-list.php');
         $content = ob_get_clean();
         
-        echo $content;
-        wp_die();
+        // Send a proper JSON response, which the JavaScript file expects.
+        wp_send_json_success(['html' => $content]);
     }
 
     /**
      * AJAX handler to fetch details for a single review.
      */
     public function get_review_details_ajax() {
-        check_ajax_referer('ctrw_nonce', 'security');
+        check_ajax_referer('ctrw_admin_nonce', 'nonce');
         if (!current_user_can('manage_options')) {
             wp_send_json_error(['message' => 'Permission denied.']);
         }
@@ -580,26 +710,56 @@ class CTRW_Controller {
     /**
      * Shortcode Callbacks
      */
+
+    /**
+     * Renders the review submission form shortcode.
+     *
+     * @return string The HTML for the form.
+     */
     public function customer_reviews_form_shortcode() {
         ob_start();
         include CTRW_PLUGIN_PATH . 'includes/views/shortcodes/ctrw-form.php';
         return ob_get_clean();
     }
+
+    /**
+     * Renders the review list shortcode.
+     *
+     * @return string The HTML for the review list.
+     */
     public function customer_reviews_list_shortcode() {
         ob_start();
         include CTRW_PLUGIN_PATH . 'includes/views/shortcodes/ctrw-list.php';
         return ob_get_clean();
     }
+
+    /**
+     * Renders the review summary shortcode.
+     *
+     * @return string The HTML for the summary.
+     */
     public function ctrw_display_summary() {
         ob_start();
         include CTRW_PLUGIN_PATH . 'includes/views/shortcodes/ctrw-summary.php';
         return ob_get_clean();
     }
+
+    /**
+     * Renders the floating widget shortcode.
+     *
+     * @return string The HTML for the widget.
+     */
     public function ctrw_display_floating_widget() {
         ob_start();
         include CTRW_PLUGIN_PATH . 'includes/views/shortcodes/ctrw-floating.php';
         return ob_get_clean();
     }
+    
+    /**
+     * Renders the review slider shortcode.
+     *
+     * @return string The HTML for the slider.
+     */
     public function ctrw_display_slider() {
         ob_start();
         include CTRW_PLUGIN_PATH . 'includes/views/shortcodes/ctrw-slider.php';
@@ -607,7 +767,7 @@ class CTRW_Controller {
     }
 
     /**
-     * Display product review info on shop/product pages
+     * Display product review info on shop/product pages.
      */
     public function ctrw_display_product_review_info() {
         global $post;
@@ -619,7 +779,6 @@ class CTRW_Controller {
         if ($review_count > 0) {
             $star_color = get_option('customer_reviews_settings')['star_color'] ?? '#fbbc04';
             echo '<div class="ctrw-product-review-summary" style="margin: 5px 0 10px; font-size: 14px; display: flex; align-items: center;">';
-            // Simple star display
             echo '<div class="ctrw-stars" style="color:'.esc_attr($star_color).'; margin-right: 5px;">';
             for ($i = 1; $i <= 5; $i++) {
                 if ($i <= $average_rating) {
@@ -635,7 +794,7 @@ class CTRW_Controller {
     }
     
     /**
-     * Output Schema Markup in the header
+     * Output Schema Markup in the header.
      */
     public function ctrw_output_schema_markup() {
         $schemaSettings = get_option('customer_reviews_settings');
