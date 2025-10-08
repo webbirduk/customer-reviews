@@ -2,7 +2,7 @@
 if (!defined('ABSPATH')) {
     exit;
 }
-$reviews = (new CTRW_Model())->get_reviews('approved');
+$reviews = (new CTRW_Model())->ctrw_get_reviews('approved');
 $settings = get_option('customer_reviews_settings');
 // We will now display all reviews, so the lines for pagination are removed.
 ?>
@@ -11,7 +11,7 @@ $settings = get_option('customer_reviews_settings');
     <div class="ctrw-floating-tab">
         <div class="ctrw-tab-content">
             <span class="ctrw-tab-icon">★</span>
-            <span class="ctrw-tab-text">Reviews</span>
+            <span class="ctrw-tab-text"><?php esc_html_e('Reviews', 'ctrw-reviews'); ?></span>
             <span class="ctrw-tab-count"><?= count($reviews) ?></span>
         </div>
     </div>
@@ -21,7 +21,7 @@ $settings = get_option('customer_reviews_settings');
             <div class="ctrw-reviews-header">
                 <h3 class="ctrw-reviews-title">
                     <span class="ctrw-title-icon">★</span>
-                    Customer Reviews
+                    <?php esc_html_e('Customer Reviews', 'ctrw-reviews'); ?>
                 </h3>
                 <button class="ctrw-close-btn" aria-label="Close reviews">
                     <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -82,7 +82,7 @@ $settings = get_option('customer_reviews_settings');
                                         <path d="M12 8V12" stroke="#FFB800" stroke-width="2" stroke-linecap="round"/>
                                         <path d="M12 16H12.01" stroke="#FFB800" stroke-width="2" stroke-linecap="round"/>
                                     </svg>
-                                    <span>Author Response</span>
+                                    <span><?php esc_html_e('Author Response', 'ctrw-reviews'); ?></span>
                                 </div>
                                 <div class="ctrw-reply-content"><?= esc_html($review->admin_reply) ?></div>
                             </div>

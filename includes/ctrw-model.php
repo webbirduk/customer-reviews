@@ -29,7 +29,7 @@ class CTRW_Model {
      * @param string $status The review status to filter by (e.g., 'approved', 'pending'). Use 'all' to get all reviews.
      * @return array An array of review objects.
      */
-    public function get_reviews_by_status(string $status): array {
+    public function ctrw_ctrw_get_reviews_by_status(string $status): array {
         if ('All' === $status) {
             return $this->wpdb->get_results("SELECT * FROM {$this->table} ORDER BY created_at DESC");
         }
@@ -46,7 +46,7 @@ class CTRW_Model {
      *
      * @return array An associative array with status keys and count values.
      */
-    public function get_review_counts(): array {
+    public function ctrw_get_review_counts(): array {
         $counts = [
             'All'      => 0,
             'Approved' => 0,
@@ -78,7 +78,7 @@ class CTRW_Model {
      *
      * @return float The average rating, rounded to one decimal place.
      */
-    public function get_average_rating(): float {
+    public function ctrw_get_average_rating(): float {
         $result = $this->wpdb->get_var(
             "SELECT AVG(rating) FROM {$this->table} WHERE status = 'approved'"
         );
@@ -92,7 +92,7 @@ class CTRW_Model {
      * @param string $status The new status to set.
      * @return int|false The number of rows updated, or false on error.
      */
-    public function update_review_status(array $review_ids, string $status) {
+    public function ctrw_ctrw_update_review_status(array $review_ids, string $status) {
         if (empty($review_ids)) {
             return false;
         }
@@ -111,7 +111,7 @@ class CTRW_Model {
      *
      * @return int The number of reviews successfully imported.
      */
-    public function import_reviews_from_site_reviews_plugin(): int {
+    public function ctrw_import_reviews_from_site_reviews_plugin(): int {
         $site_reviews = $this->wpdb->get_results(
             "SELECT ID, post_date, post_content, post_title
              FROM {$this->wpdb->posts} 
@@ -155,7 +155,7 @@ class CTRW_Model {
      *
      * @return int The number of reviews successfully imported.
      */
-    public function import_reviews_from_wp_customer_reviews(): int {
+    public function ctrw_import_reviews_from_wp_customer_reviews(): int {
         $review_posts = $this->wpdb->get_results(
             "SELECT p.ID, p.post_date, p.post_content 
             FROM {$this->wpdb->posts} p
@@ -197,7 +197,7 @@ class CTRW_Model {
      * @param array $review_ids An array of review IDs to delete.
      * @return int|false The number of rows deleted, or false on error.
      */
-    public function delete_reviews(array $review_ids) {
+    public function ctrw_delete_reviews(array $review_ids) {
         if (empty($review_ids)) {
             return false;
         }
@@ -227,7 +227,7 @@ class CTRW_Model {
      * @param string $status The status of reviews to fetch (defaults to 'approved').
      * @return array An array of review objects.
      */
-    public function get_reviews(string $status = 'approved'): array {
+    public function ctrw_get_reviews(string $status = 'approved'): array {
         return $this->wpdb->get_results(
             $this->wpdb->prepare(
                 "SELECT * FROM {$this->table} WHERE status = %s ORDER BY created_at DESC",
@@ -242,7 +242,7 @@ class CTRW_Model {
      * @param int $id The ID of the review.
      * @return object|null The review object, or null if not found.
      */
-    public function get_review_by_id(int $id): ?object {
+    public function ctrw_get_review_by_id(int $id): ?object {
         return $this->wpdb->get_row(
             $this->wpdb->prepare("SELECT * FROM {$this->table} WHERE id = %d", $id)
         );
@@ -254,7 +254,7 @@ class CTRW_Model {
      * @param int $positionid The post ID (positionid).
      * @return int The number of reviews.
      */
-    public function get_review_count_by_positionid(int $positionid): int {
+    public function ctrw_get_review_count_by_positionid(int $positionid): int {
         return (int) $this->wpdb->get_var(
             $this->wpdb->prepare(
                 "SELECT COUNT(*) FROM {$this->table} WHERE positionid = %d AND status = 'approved'",
@@ -269,7 +269,7 @@ class CTRW_Model {
      * @param int $positionid The post ID (positionid).
      * @return float The average rating.
      */
-    public function get_average_rating_by_positionid(int $positionid): float {
+    public function ctrw_get_average_rating_by_positionid(int $positionid): float {
         $avg = $this->wpdb->get_var(
             $this->wpdb->prepare(
                 "SELECT AVG(rating) FROM {$this->table} WHERE positionid = %d AND status = 'approved'",
@@ -286,7 +286,7 @@ class CTRW_Model {
      * @param array $data An associative array of data to update.
      * @return int|false The number of rows updated, or false on error.
      */
-    public function update_review(int $id, array $data) {
+    public function ctrw_update_review(int $id, array $data) {
         return $this->wpdb->update($this->table, $data, ['id' => $id]);
     }
 
@@ -296,7 +296,7 @@ class CTRW_Model {
      * @param string $status The status to count reviews for.
      * @return int The number of reviews with the given status.
      */
-    public function get_review_count_by_status(string $status): int {
+    public function ctrw_get_review_count_by_status(string $status): int {
         return (int) $this->wpdb->get_var(
             $this->wpdb->prepare("SELECT COUNT(*) FROM {$this->table} WHERE status = %s", $status)
         );

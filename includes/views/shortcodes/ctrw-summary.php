@@ -2,7 +2,7 @@
 if (!defined('ABSPATH')) {
     exit;
 }
-$reviews = (new CTRW_Model())->get_reviews('approved');
+$reviews = (new CTRW_Model())->ctrw_get_reviews('approved');
 $settings = get_option('customer_reviews_settings');
 
 // Calculate average rating and rating counts
@@ -24,7 +24,7 @@ if ($total_reviews > 0) {
 
 <div class="review-widget-container">
     <div class="review-header">
-        Customer Reviews Summary
+        <?php esc_html_e('Customer Reviews Summary', 'ctrw-reviews'); ?>
     </div>
     <div class="review-content">
         <div class="rating-summary-block">

@@ -4,15 +4,15 @@
     
  
     <h2 class="nav-tab-wrapper">
-        <a href="#" id="ctrw-general-tab" class="nav-tab nav-tab-active" data-tab="general">General</a>
-        <a href="#" id="ctrw-review-form-tab"class="nav-tab" data-tab="review_form">Review Form Settings</a>
-        <a href="#" id="ctrw-shortcodes-tab"class="nav-tab" data-tab="display">Shortcodes</a>
-        <a href="#" id="ctrw-schema-tab" class="nav-tab" data-tab="schema">Schema Settings</a>
-        <a href="#" id="ctrw-advanced-tab" class="nav-tab" data-tab="advanced">Advanced Settings</a>
+        <a href="#" id="ctrw-general-tab" class="nav-tab nav-tab-active" data-tab="general"><?php esc_html_e('General', 'ctrw-reviews'); ?></a>
+        <a href="#" id="ctrw-review-form-tab" class="nav-tab" data-tab="review_form"><?php esc_html_e('Review Form Settings', 'ctrw-reviews'); ?></a>
+        <a href="#" id="ctrw-shortcodes-tab" class="nav-tab" data-tab="display"><?php esc_html_e('Shortcodes', 'ctrw-reviews'); ?></a>
+        <a href="#" id="ctrw-schema-tab" class="nav-tab" data-tab="schema"><?php esc_html_e('Schema Settings', 'ctrw-reviews'); ?></a>
+        <a href="#" id="ctrw-advanced-tab" class="nav-tab" data-tab="advanced"><?php esc_html_e('Advanced Settings', 'ctrw-reviews'); ?></a>
     </h2>
 
     <div id="ctrw-success-msg" class="notice notice-success is-dismissible" style="display: none;">
-        <p>Customer Review Settings Saved Successfully.</p>
+        <p><?php esc_html_e('Customer Review Settings Saved Successfully.', 'ctrw-reviews'); ?></p>
     </div>
 
     <form method="post"  id="ctrw-form-settings" class="wp-review-settings-form">
@@ -44,7 +44,7 @@
                     <?php esc_html_e('Include Time', 'ctrw-reviews'); ?>
                     <span class="ctrw-tooltip">
 					<span class="dashicons dashicons-editor-help"></span>
-					<span class="tooltiptext tooltip-right-msg">Display a time stamp behind the date on each comment.</span>
+					<span class="tooltiptext tooltip-right-msg"><?php esc_html_e('Display a time stamp behind the date on each comment.', 'ctrw-reviews'); ?></span>
 				    </span>
                     
                 
@@ -63,7 +63,7 @@
                      <?php esc_html_e('Enable Customer Email Receipt', 'ctrw-reviews'); ?>
                     <span class="ctrw-tooltip">
 					<span class="dashicons dashicons-editor-help"></span>
-					<span class="tooltiptext tooltip-right-msg">Users receive a receipt from their form submission</span>
+					<span class="tooltiptext tooltip-right-msg"><?php esc_html_e('Users receive a receipt from their form submission', 'ctrw-reviews'); ?></span>
 				    </span>
                    </label>
                     <label for="auto_approve_reviews">
@@ -72,7 +72,7 @@
                       <?php esc_html_e('Enable Automatic Review Approval', 'ctrw-reviews'); ?>
                         <span class="ctrw-tooltip">
 					<span class="dashicons dashicons-editor-help"></span>
-					<span class="tooltiptext tooltip-right-msg">New reviews are immediately posted for viewing without admin review.</span>
+					<span class="tooltiptext tooltip-right-msg"><?php esc_html_e('New reviews are immediately posted for viewing without admin review.', 'ctrw-reviews'); ?></span>
 				    </span>
                        
                     </label>
@@ -82,7 +82,7 @@
                      <?php esc_html_e('Show City in Review List', 'ctrw-reviews'); ?>
                         <span class="ctrw-tooltip">
 					<span class="dashicons dashicons-editor-help"></span>
-					<span class="tooltiptext tooltip-right-msg">This option allows the city to be displayed with each comment.</span>
+					<span class="tooltiptext tooltip-right-msg"><?php esc_html_e('This option allows the city to be displayed with each comment.', 'ctrw-reviews'); ?></span>
 				    </span>
                     
                     </label>
@@ -92,7 +92,7 @@
           <?php esc_html_e('Show State in Review List', 'ctrw-reviews'); ?>
                         <span class="ctrw-tooltip">
 					<span class="dashicons dashicons-editor-help"></span>
-					<span class="tooltiptext tooltip-right-msg">This option allows the state to be displayed with each comment.</span>
+					<span class="tooltiptext tooltip-right-msg"><?php esc_html_e('This option allows the state to be displayed with each comment.', 'ctrw-reviews'); ?></span>
 				    </span>
                       
                     </label>    <label for="enable_review_title">
@@ -101,7 +101,7 @@
                                <?php esc_html_e('Enable Review Title', 'ctrw-reviews'); ?>
                             <span class="ctrw-tooltip">
 					<span class="dashicons dashicons-editor-help"></span>
-					<span class="tooltiptext tooltip-right-msg">This option allows the review title to be displayed with each comment.</span>
+					<span class="tooltiptext tooltip-right-msg"><?php esc_html_e('This option allows the review title to be displayed with each comment.', 'ctrw-reviews'); ?></span>
 				    </span>
                          
                         </label>
@@ -130,8 +130,8 @@
 
         <label for="comment_font_style"><?php esc_html_e('Comment Font Style:', 'ctrw-reviews'); ?></label>
                     <select name="comment_font_style" id="comment_font_style">
-                        <option value="normal" <?= selected(get_option('customer_reviews_settings')['comment_font_style'] ?? '', 'normal', false) ?>>Normal</option>
-                        <option value="italic" <?= selected(get_option('customer_reviews_settings')['comment_font_style'] ?? '', 'italic', false) ?>>Italic</option>
+                        <option value="normal" <?= selected(get_option('customer_reviews_settings')['comment_font_style'] ?? '', 'normal', false) ?>><?php esc_html_e('Normal', 'ctrw-reviews'); ?></option>
+                        <option value="italic" <?= selected(get_option('customer_reviews_settings')['comment_font_style'] ?? '', 'italic', false) ?>><?php esc_html_e('Italic', 'ctrw-reviews'); ?></option>
                     </select>
 
                     <label for="comment_box_fill_color"><?php esc_html_e('Comment Box Fill Color:', 'ctrw-reviews'); ?></label>
@@ -225,29 +225,29 @@
         <div class="form-group tab-section" id="tab-display" style="display:none">
             <h3><?php esc_html_e('Shortcodes', 'ctrw-reviews'); ?></h3>
             <div class="shortcode-section">
-                <label for="shortcode-form">Reviews Form:</label>
+                <label for="shortcode-form"><?php esc_html_e('Reviews Form:', 'ctrw-reviews'); ?></label>
                 <input type="text" id="shortcode-form" value="[wp_ctrw_form]" readonly>
-                <button type="button" class="copy-button" data-clipboard-text="[wp_ctrw_form]">Copy</button>
+                <button type="button" class="copy-button" data-clipboard-text="[wp_ctrw_form]"><?php esc_html_e('Copy', 'ctrw-reviews'); ?></button>
             </div>
             <div class="shortcode-section">
-                <label for="shortcode-summary">Reviews Summary:</label>
+                <label for="shortcode-summary"><?php esc_html_e('Reviews Summary:', 'ctrw-reviews'); ?></label>
                 <input type="text" id="shortcode-summary" value="[wp_ctrw_summary]" readonly>
-                <button type="button" class="copy-button" data-clipboard-text="[wp_ctrw_summary]">Copy</button>
+                <button type="button" class="copy-button" data-clipboard-text="[wp_ctrw_summary]"><?php esc_html_e('Copy', 'ctrw-reviews'); ?></button>
             </div>
             <div class="shortcode-section">
-                <label for="shortcode-list">Reviews List:</label>
+                <label for="shortcode-list"><?php esc_html_e('Reviews List:', 'ctrw-reviews'); ?></label>
                 <input type="text" id="shortcode-list" value="[wp_ctrw_lists]" readonly>
-                <button type="button" class="copy-button" data-clipboard-text="[wp_ctrw_lists]">Copy</button>
+                <button type="button" class="copy-button" data-clipboard-text="[wp_ctrw_lists]"><?php esc_html_e('Copy', 'ctrw-reviews'); ?></button>
             </div>
             <div class="shortcode-section">
-                <label for="shortcode-slider">Reviews Slider:</label>
+                <label for="shortcode-slider"><?php esc_html_e('Reviews Slider:', 'ctrw-reviews'); ?></label>
                 <input type="text" id="shortcode-slider" value="[wp_ctrw_slider]" readonly>
-                <button type="button" class="copy-button" data-clipboard-text="[wp_ctrw_slider]">Copy</button>
+                <button type="button" class="copy-button" data-clipboard-text="[wp_ctrw_slider]"><?php esc_html_e('Copy', 'ctrw-reviews'); ?></button>
             </div>
             <div class="shortcode-section">
-                <label for="shortcode-widget">Reviews Floating Widget:</label>
+                <label for="shortcode-widget"><?php esc_html_e('Reviews Floating Widget:', 'ctrw-reviews'); ?></label>
                 <input type="text" id="shortcode-widget" value="[wp_ctrw_widget]" readonly>
-                <button type="button" class="copy-button" data-clipboard-text="[wp_ctrw_widget]">Copy</button>
+                <button type="button" class="copy-button" data-clipboard-text="[wp_ctrw_widget]"><?php esc_html_e('Copy', 'ctrw-reviews'); ?></button>
             </div>
         </div>
 
@@ -260,34 +260,34 @@
             <table class="form-table">
             <tbody>
                 <tr>
-                    <th scope="row"><label for="enabled_schema">Enabled Schema markup</label></th>
+                    <th scope="row"><label for="enabled_schema"><?php esc_html_e('Enabled Schema markup', 'ctrw-reviews'); ?></label></th>
                     <td>
                         <input type="checkbox" name="enabled_schema" id="enabled_schema" value="1" <?php checked(isset($schemaSettings['enabled_schema']) ? $schemaSettings['enabled_schema'] : '', '1'); ?>>
                     </td>
                 </tr>
                 <tr>
-                    <th scope="row"><label for="business_name">Local Business Name</label></th>
+                    <th scope="row"><label for="business_name"><?php esc_html_e('Local Business Name', 'ctrw-reviews'); ?></label></th>
                     <td>
                         <input type="text" id="business_name" name="business_name" class="regular-text" placeholder="Your Business Name" value="<?php echo isset($schemaSettings['business_name']) ? esc_attr($schemaSettings['business_name']) : esc_attr(get_bloginfo('name')); ?>">
                     </td>
                 </tr>
                 
                 <tr>
-                    <th scope="row"><label for="default_description">Default Description</label></th>
+                    <th scope="row"><label for="default_description"><?php esc_html_e('Default Description', 'ctrw-reviews'); ?></label></th>
                     <td>
                         <input type="text" id="default_description" name="default_description" class="regular-text" placeholder="Enter default description" value="<?php echo isset($schemaSettings['default_description']) ? esc_attr($schemaSettings['default_description']) : esc_attr(get_bloginfo('description')); ?>">
                     </td>
                 </tr>
                 
                 <tr>
-                    <th scope="row"><label for="default_url">Default URL</label></th>
+                    <th scope="row"><label for="default_url"><?php esc_html_e('Default URL', 'ctrw-reviews'); ?></label></th>
                     <td>
                         <input type="text" id="default_url" name="default_url" class="regular-text" placeholder="Enter default URL" value="<?php echo isset($schemaSettings['default_url']) ? esc_attr($schemaSettings['default_url']) : esc_url(home_url('/')); ?>">
                     </td>
                 </tr>
                 
                 <tr>
-                    <th scope="row"><label for="default_image">Default Image</label></th>
+                    <th scope="row"><label for="default_image"><?php esc_html_e('Default Image', 'ctrw-reviews'); ?></label></th>
                     <td>
                             <div class="image-upload-wrapper">
                                 <div class="image-preview-wrapper">
@@ -298,27 +298,27 @@
                                 </div>
                                 <input id="upload_image_button" type="button" class="button" value="Upload Image" />
                                 <input type="hidden" name="custom_image_url" id="custom_image_url" value="<?php echo esc_attr($image_url); ?>">
-                                <p class="description">Upload an image or it will use the site icon by default.</p>
+                                <p class="description"><?php esc_html_e('Upload an image or it will use the site icon by default.', 'ctrw-reviews'); ?></p>
                             </div>
                     </td>
                 </tr>
                 
                 <tr>
-                    <th scope="row"><label for="business_address">Address</label></th>
+                    <th scope="row"><label for="business_address"><?php esc_html_e('Address', 'ctrw-reviews'); ?></label></th>
                     <td>
                         <textarea id="business_address" name="business_address" class="regular-text" style="height: 80px;"><?php echo isset($schemaSettings['business_address']) ? esc_textarea($schemaSettings['business_address']) : ''; ?></textarea>
                     </td>
                 </tr>
                 
                 <tr>
-                    <th scope="row"><label for="business_phone">Telephone Number</label></th>
+                    <th scope="row"><label for="business_phone"><?php esc_html_e('Telephone Number', 'ctrw-reviews'); ?></label></th>
                     <td>
                         <input type="text" id="business_phone" name="business_phone" class="regular-text" value="<?php echo isset($schemaSettings['business_phone']) ? esc_attr($schemaSettings['business_phone']) : ''; ?>">
                     </td>
                 </tr>
                 
                 <tr>
-                    <th scope="row"><label for="price_range">Price Range</label></th>
+                    <th scope="row"><label for="price_range"><?php esc_html_e('Price Range', 'ctrw-reviews'); ?></label></th>
                     <td>
                         <select id="price_range" name="price_range" class="regular-text">
                             <option value="$" <?php selected(isset($schemaSettings['price_range']) ? $schemaSettings['price_range'] : '', '$'); ?>>$</option>
@@ -353,7 +353,7 @@
                     <?php esc_html_e('Notification Admin Emails', 'ctrw-reviews'); ?>
                     <span class="ctrw-tooltip">
                         <span class="dashicons dashicons-editor-help"></span>
-                        <span class="tooltiptext tooltip-right-msg">If more than one email, separate with a comma.</span>
+                        <span class="tooltiptext tooltip-right-msg"><?php esc_html_e('If more than one email, separate with a comma.', 'ctrw-reviews'); ?></span>
                     </span>
                 </label>
                 <?php
@@ -370,7 +370,7 @@
         </div>
         
         <p class="submit">
-            <button type="submit" class="button-primary">Save Settings</button>
+            <button type="submit" class="button-primary"><?php esc_html_e('Save Settings', 'ctrw-reviews'); ?></button>
         </p>    
     </form>
 </div>

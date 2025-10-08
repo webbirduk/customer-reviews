@@ -8,7 +8,7 @@ jQuery(document).ready(function($) {
         $('#comment_box_fill_color').wpColorPicker();
     }
 
-    $('.reply-now').on('click', function() {
+    $('.ctrw-reply-now').on('click', function() {
         var reviewId = $(this).data('review-id');
         var $button = $(this);
         $button.prop('disabled', true).text('Loading...'); // Add loading feedback
@@ -60,7 +60,7 @@ jQuery(document).ready(function($) {
             url: ctrw_admin_ajax.ajax_url, 
             method: 'POST',
             data: {
-                action: 'save_review_reply',
+                action: 'ctrw_save_review_reply',
                 review_id: reviewId,
                 reply_message: replyMessage,
                 nonce: ctrw_admin_ajax.nonce 
@@ -152,7 +152,7 @@ jQuery(document).ready(function($) {
             url: ctrw_admin_ajax.ajax_url,
             method: 'POST',
             data: {
-                action: 'edit_customer_review',
+                action: 'ctrw_edit_customer_review',
                 id: $('#edit-review-id').val(),
                 update_type: $('#update-type').val(),
                 name: $('#edit-review-name').val(),
@@ -296,7 +296,7 @@ jQuery(document).ready(function($) {
         });
         // Save the setting via AJAX
         $.post(ajaxurl, { 
-            action: 'ctrw_save_column_visibility', 
+            action: 'ctrw_ctrw_save_column_visibility', 
             columns: data, 
             _wpnonce: ctrw_admin_ajax.nonce // Use the localized nonce
         });

@@ -19,7 +19,7 @@ if (defined('DOING_AJAX') && DOING_AJAX) {
 }
 
 // Get all approved reviews from the database.
-$all_reviews = (new CTRW_Model())->get_reviews('approved');
+$all_reviews = (new CTRW_Model())->ctrw_get_reviews('approved');
 
 // Filter the reviews to only include those for the current post/page.
 $filtered_reviews = [];
@@ -76,7 +76,7 @@ $reviews_for_page = array_slice($filtered_reviews, $offset, $reviews_per_page);
                         </div>
                     </div>
 
-                    <div class="review-item" style="background-color: <?= esc_attr($settings['comment_box_fill_color'] ?? '#f5f5f5'); ?>;">
+                    <div class="ctrw-review-item" style="background-color: <?= esc_attr($settings['comment_box_fill_color'] ?? '#f5f5f5'); ?>;">
                         <div class="review-header">
                             <span class="stars">
                                 <?= str_repeat('<span class="star filled">★</span>', (int)$review->rating); ?>
@@ -97,7 +97,7 @@ $reviews_for_page = array_slice($filtered_reviews, $offset, $reviews_per_page);
                         
                         <?php if (!empty($review->admin_reply)) : ?>
                             <div class="admin-response">
-                                <strong>Author Response</strong>
+                                <strong><?php esc_html_e('Author Response', 'ctrw-reviews'); ?></strong>
                                 <p><?= nl2br(esc_html($review->admin_reply)); ?></p>
                             </div>
                         <?php endif; ?>
@@ -125,7 +125,9 @@ $reviews_for_page = array_slice($filtered_reviews, $offset, $reviews_per_page);
                 <?php endif; ?>
 
             <?php else : ?>
-                <div class="no-reviews-message">No reviews found for this page.</div>
+                <div class="no-reviews-message">
+                    <?php esc_html_e('No reviews found for this page.', 'ctrw-reviews'); ?>
+                </div>
             <?php endif; ?>
         </div>
 

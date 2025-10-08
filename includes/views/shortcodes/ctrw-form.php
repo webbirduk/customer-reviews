@@ -1,7 +1,7 @@
 <?php if (!defined('ABSPATH')) exit; ?>
 
 <div class="customer-reviews-form-container">
-    <b class="ctrw-form-heading"><?php esc_html_e('Submit Your Review', 'customer-reviews'); ?></b>
+    <b class="ctrw-form-heading"><?php esc_html_e('Submit Your Review', 'ctrw-reviews'); ?></b>
     <form id="customer-reviews-form">
         <?php 
         $fields = CTRW_Controller::get_review_form_fields();
@@ -48,7 +48,7 @@
         endforeach; ?>
         
         <input type="hidden" name="positionid" value="<?php echo esc_attr(get_the_ID()); ?>">
-        <input class="button-default" id="comment-submit" type="submit" value="<?php esc_attr_e('Submit', 'customer-reviews'); ?>">
+        <input class="button-default" id="comment-submit" type="submit" value="<?php esc_attr_e('Submit', 'ctrw-reviews'); ?>">
     </form>
     <p id="review-message"></p>
 </div>

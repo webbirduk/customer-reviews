@@ -69,7 +69,7 @@ final class Customer_Reviews_Plugin {
         define('CTRW_PLUGIN_URL', plugin_dir_url(__FILE__));
         define('CTRW_PLUGIN_ASSETS', CTRW_PLUGIN_URL . 'assets/');
         define('CTRW_BASE_NAME', plugin_basename(__FILE__));
-        define('CTRW_TEXT_DOMAIN', 'customer-reviews');
+        define('CTRW_TEXT_DOMAIN', 'ctrw-reviews');
     }
 
     /**

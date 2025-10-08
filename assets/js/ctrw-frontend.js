@@ -17,7 +17,7 @@ jQuery(document).ready(function ($) {
             
             // Create a data object from the form
             const formData = {
-                action: 'submit_review',
+                action: 'ctrw_submit_review',
                 nonce: ctrw_ajax.nonce
             };
 

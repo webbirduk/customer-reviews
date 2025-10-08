@@ -18,13 +18,13 @@
     <div class="tablenav top">
         <div class="alignleft actions">
             <select name="bulk_action">
-                <option value="">Bulk Actions</option>
-                <option value="approve">Approve</option>
-                <option value="pending">Pending</option>
-                <option value="reject">Reject</option>
-                <option value="trash">Move to Trash</option>
+                <option value=""><?php esc_html_e('Bulk Actions', 'ctrw-reviews'); ?></option>
+                <option value="approve"><?php esc_html_e('Approve', 'ctrw-reviews'); ?></option>
+                <option value="pending"><?php esc_html_e('Pending', 'ctrw-reviews'); ?></option>
+                <option value="reject"><?php esc_html_e('Reject', 'ctrw-reviews'); ?></option>
+                <option value="trash"><?php esc_html_e('Move to Trash', 'ctrw-reviews'); ?></option>
                 <?php if ($current_status === 'trash'): ?>
-                    <option value="delete_permanently">Delete Permanently</option>
+                    <option value="delete_permanently"><?php esc_html_e('Delete Permanently', 'ctrw-reviews'); ?></option>
                 <?php endif; ?>
             </select>
 
@@ -32,10 +32,10 @@
             $selected_review_type = $_POST['review_type'] ?? '';
             ?>
             <select name="review_type">
-                <option value="" <?= $selected_review_type === '' ? 'selected' : '' ?>>All Review Types</option>
-                <option value="page" <?= $selected_review_type === 'page' ? 'selected' : '' ?>>Page Reviews</option>
-                <option value="post" <?= $selected_review_type === 'post' ? 'selected' : '' ?>>Post Reviews</option>
-                <option value="product" <?= $selected_review_type === 'product' ? 'selected' : '' ?>>Product Reviews</option>
+                <option value="" <?= $selected_review_type === '' ? 'selected' : '' ?>><?php esc_html_e('All Review Types', 'ctrw-reviews'); ?></option>
+                <option value="page" <?= $selected_review_type === 'page' ? 'selected' : '' ?>><?php esc_html_e('Page Reviews', 'ctrw-reviews'); ?></option>
+                <option value="post" <?= $selected_review_type === 'post' ? 'selected' : '' ?>><?php esc_html_e('Post Reviews', 'ctrw-reviews'); ?></option>
+                <option value="product" <?= $selected_review_type === 'product' ? 'selected' : '' ?>><?php esc_html_e('Product Reviews', 'ctrw-reviews'); ?></option>
             </select>
 
             <input type="submit" name="filter_action" id="post-query-submit" class="button" value="Filter">
@@ -61,13 +61,13 @@
         <thead>
             <tr>
                 <th scope="col" class="check-column"><input type="checkbox" id="select-all" /></th>
-                <th>Review Title</th>
-                <th>Author</th>
-                <th>Rating</th>
-                <th>Review</th>
-                <th>Admin Reply</th>
-                <th>Status</th>
-                <th>Action</th>
+                <th><?php esc_html_e('Review Title', 'ctrw-reviews'); ?></th>
+                <th><?php esc_html_e('Author', 'ctrw-reviews'); ?></th>
+                <th><?php esc_html_e('Rating', 'ctrw-reviews'); ?></th>
+                <th><?php esc_html_e('Review', 'ctrw-reviews'); ?></th>
+                <th><?php esc_html_e('Admin Reply', 'ctrw-reviews'); ?></th>
+                <th><?php esc_html_e('Status', 'ctrw-reviews'); ?></th>
+                <th><?php esc_html_e('Action', 'ctrw-reviews'); ?></th>
             </tr>
         </thead>
         <tbody>
@@ -105,12 +105,12 @@
                         </td>
                         <td>
                             <?php if ($review['status'] !== 'rejected'): ?>
-                                <button type="button" class="button reply-now"
-                                    data-review-id="<?= intval($review['id']) ?>">Reply</button>
+                                <button type="button" class="button ctrw-reply-now"
+                                    data-review-id="<?= intval($review['id']) ?>"><?php esc_html_e('Reply', 'ctrw-reviews'); ?></button>
                                 <button type="button" class="button edit-review"
                                     data-review-id="<?= intval($review['id']) ?>"
                                     data-update-type="update">
-                                    Edit Review
+                                    <?php esc_html_e('Edit Review', 'ctrw-reviews'); ?>
                                 </button>
                             <?php else: ?>
                                 &mdash;
@@ -119,7 +119,7 @@
                     </tr>
                 <?php endforeach; ?>
             <?php else: ?>
-                <tr><td colspan="8">No reviews found.</td></tr>
+                <tr><td colspan="8"><?php esc_html_e('No reviews found.', 'ctrw-reviews'); ?></td></tr>
             <?php endif; ?>
         </tbody>
     </table>
