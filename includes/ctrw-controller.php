@@ -442,7 +442,7 @@ class CTRW_Controller {
             }
         }
         $status = isset($_GET['status']) ? sanitize_text_field($_GET['status']) : 'all';
-        $reviews = $this->model->ctrw_ctrw_get_reviews_by_status($status);
+        $reviews = $this->model->ctrw_get_reviews_by_status($status);
         $counts = $this->model->ctrw_get_review_counts();
         $this->view->display_reviews($reviews, $counts, $status);
     }
@@ -456,13 +456,13 @@ class CTRW_Controller {
         if (!empty($review_ids)) {
             switch($action) {
                 case 'approve':
-                    $this->model->ctrw_ctrw_update_review_status($review_ids, 'Approved');
+                    $this->model->ctrw_update_review_status($review_ids, 'Approved');
                     break;
                 case 'reject':
-                    $this->model->ctrw_ctrw_update_review_status($review_ids, 'Rejected');
+                    $this->model->ctrw_update_review_status($review_ids, 'Rejected');
                     break;
                 case 'trash':
-                    $this->model->ctrw_ctrw_update_review_status($review_ids, 'Trash');
+                    $this->model->ctrw_update_review_status($review_ids, 'Trash');
                     break;
                 case 'delete_permanently':
                     $this->model->ctrw_delete_reviews($review_ids);
@@ -834,14 +834,5 @@ class CTRW_Controller {
         ];
         
         echo '<script type="application/ld+json">' . wp_json_encode($schema, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . '</script>';
-    }
-
-    /**
-     * Returns the list of available review form fields.
-     *
-     * @return array The list of form field labels.
-     */
-    public static function get_review_form_fields() {
-        return ['Name', 'Email', 'Website', 'Phone', 'City', 'State', 'Review Title', 'Comment', 'Rating'];
     }
 }

@@ -29,7 +29,7 @@ class CTRW_Model {
      * @param string $status The review status to filter by (e.g., 'approved', 'pending'). Use 'all' to get all reviews.
      * @return array An array of review objects.
      */
-    public function ctrw_ctrw_get_reviews_by_status(string $status): array {
+    public function ctrw_get_reviews_by_status(string $status): array {
         if ('All' === $status) {
             return $this->wpdb->get_results("SELECT * FROM {$this->table} ORDER BY created_at DESC");
         }
@@ -92,7 +92,7 @@ class CTRW_Model {
      * @param string $status The new status to set.
      * @return int|false The number of rows updated, or false on error.
      */
-    public function ctrw_ctrw_update_review_status(array $review_ids, string $status) {
+    public function ctrw_update_review_status(array $review_ids, string $status) {
         if (empty($review_ids)) {
             return false;
         }
