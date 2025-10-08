@@ -13,7 +13,8 @@
 
 <form method="post">
     <input type="hidden" name="page" value="customer-reviews" />
-    
+    <?php wp_nonce_field('ctrw_bulk_action_nonce', 'ctrw_bulk_nonce'); ?>
+
     <div class="tablenav top">
         <div class="alignleft actions">
             <select name="bulk_action">

@@ -10,7 +10,7 @@
 
         foreach ($fields as $field): 
             
-            // FIX: Convert field name to a valid snake_case key (e.g., "Review Title" -> "review_title")
+            // Convert field name to a valid snake_case key (e.g., "Review Title" -> "review_title")
             $field_key = strtolower(str_replace(' ', '_', $field));
             
             // Set defaults for fresh installs before settings are saved

@@ -426,8 +426,18 @@ class CTRW_Controller {
      * Displays the main reviews management page.
      */
     public function display_reviews_page() {
-        if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['bulk_action']) && !empty($_POST['review_ids'])) {
-            $this->handle_bulk_action();
+        if (
+            $_SERVER['REQUEST_METHOD'] === 'POST' && 
+            !empty($_POST['bulk_action']) && 
+            !empty($_POST['review_ids'])
+        ) {
+            // Verify the nonce before processing
+            if (isset($_POST['ctrw_bulk_nonce']) && wp_verify_nonce($_POST['ctrw_bulk_nonce'], 'ctrw_bulk_action_nonce')) {
+                $this->handle_bulk_action();
+            } else {
+                // Handle nonce verification failure
+                wp_die('Security check failed.');
+            }
         }
         $status = isset($_GET['status']) ? sanitize_text_field($_GET['status']) : 'all';
         $reviews = $this->model->get_reviews_by_status($status);
